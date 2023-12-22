@@ -10,7 +10,7 @@
 #
 services:
   api:
-    image: golang:1.19.3-alpine3.16
+    image: golang:latest
     working_dir: /work
     command: air -c ./scripts/.air.toml
     volumes:
@@ -18,7 +18,7 @@ services:
       - ./.air/bin/:/go/bin/   # Cache for binary used only in container, such as *air*
       - .:/work/
   web:
-    image: node:18.12.1-alpine3.16
+    image: node:latest
     working_dir: /work
     depends_on: ["api"]
     ports: ["3001:3001"]
