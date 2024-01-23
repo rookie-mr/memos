@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/usememos/memos/store"
 )
 
@@ -35,4 +36,5 @@ func TestStorageStore(t *testing.T) {
 	storageList, err = ts.ListStorages(ctx, &store.FindStorage{})
 	require.NoError(t, err)
 	require.Equal(t, 0, len(storageList))
+	ts.Close()
 }

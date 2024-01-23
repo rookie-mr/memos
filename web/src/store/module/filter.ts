@@ -16,17 +16,8 @@ export const useFilterStore = () => {
       store.dispatch(
         setFilter({
           tag: undefined,
-          type: undefined,
-          duration: undefined,
           text: undefined,
           visibility: undefined,
-        })
-      );
-    },
-    setMemoTypeFilter: (type?: MemoSpecType) => {
-      store.dispatch(
-        setFilter({
-          type: type,
         })
       );
     },
@@ -41,20 +32,6 @@ export const useFilterStore = () => {
       store.dispatch(
         setFilter({
           tag: tag,
-        })
-      );
-    },
-    setFromAndToFilter: (from?: number, to?: number) => {
-      let duration = undefined;
-      if (from && to && from < to) {
-        duration = {
-          from,
-          to,
-        };
-      }
-      store.dispatch(
-        setFilter({
-          duration,
         })
       );
     },

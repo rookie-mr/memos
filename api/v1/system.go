@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/usememos/memos/api/auth"
-	"github.com/usememos/memos/common/log"
+	"go.uber.org/zap"
+
+	"github.com/usememos/memos/internal/log"
 	"github.com/usememos/memos/server/profile"
 	"github.com/usememos/memos/store"
-	"go.uber.org/zap"
 )
 
 type SystemStatus struct {
@@ -26,8 +26,6 @@ type SystemStatus struct {
 	DisablePublicMemos bool `json:"disablePublicMemos"`
 	// Max upload size.
 	MaxUploadSizeMiB int `json:"maxUploadSizeMiB"`
-	// Auto Backup Interval.
-	AutoBackupInterval int `json:"autoBackupInterval"`
 	// Additional style.
 	AdditionalStyle string `json:"additionalStyle"`
 	// Additional script.
@@ -72,26 +70,20 @@ func (s *APIV1Service) GetSystemStatus(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	systemStatus := SystemStatus{
-		Profile:              *s.Profile,
-		DBSize:               0,
-		AllowSignUp:          false,
-		DisablePasswordLogin: false,
-		DisablePublicMemos:   false,
-		MaxUploadSizeMiB:     32,
-		AutoBackupInterval:   0,
-		AdditionalStyle:      "",
-		AdditionalScript:     "",
-		CustomizedProfile: CustomizedProfile{
-			Name:        "memos",
-			LogoURL:     "",
-			Description: "",
-			Locale:      "en",
-			Appearance:  "system",
-			ExternalURL: "",
+		Profile: profile.Profile{
+			Mode:    s.Profile.Mode,
+			Version: s.Profile.Version,
 		},
-		StorageServiceID:         DatabaseStorage,
-		LocalStoragePath:         "assets/{timestamp}_{filename}",
-		MemoDisplayWithUpdatedTs: false,
+		// Allow sign up by default.
+		AllowSignUp:      true,
+		MaxUploadSizeMiB: 32,
+		CustomizedProfile: CustomizedProfile{
+			Name:       "Memos",
+			Locale:     "en",
+			Appearance: "system",
+		},
+		StorageServiceID: DefaultStorage,
+		LocalStoragePath: "assets/{timestamp}_{filename}",
 	}
 
 	hostUserType := store.RoleHost
@@ -110,14 +102,14 @@ func (s *APIV1Service) GetSystemStatus(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find system setting list").SetInternal(err)
 	}
 	for _, systemSetting := range systemSettingList {
-		if systemSetting.Name == SystemSettingServerIDName.String() || systemSetting.Name == SystemSettingSecretSessionName.String() || systemSetting.Name == SystemSettingTelegramBotTokenName.String() {
+		if systemSetting.Name == SystemSettingServerIDName.String() || systemSetting.Name == SystemSettingSecretSessionName.String() || systemSetting.Name == SystemSettingTelegramBotTokenName.String() || systemSetting.Name == SystemSettingInstanceURLName.String() {
 			continue
 		}
 
 		var baseValue any
 		err := json.Unmarshal([]byte(systemSetting.Value), &baseValue)
 		if err != nil {
-			log.Warn("Failed to unmarshal system setting value", zap.String("setting name", systemSetting.Name))
+			// Skip invalid value.
 			continue
 		}
 
@@ -130,8 +122,6 @@ func (s *APIV1Service) GetSystemStatus(c echo.Context) error {
 			systemStatus.DisablePublicMemos = baseValue.(bool)
 		case SystemSettingMaxUploadSizeMiBName.String():
 			systemStatus.MaxUploadSizeMiB = int(baseValue.(float64))
-		case SystemSettingAutoBackupIntervalName.String():
-			systemStatus.AutoBackupInterval = int(baseValue.(float64))
 		case SystemSettingAdditionalStyleName.String():
 			systemStatus.AdditionalStyle = baseValue.(string)
 		case SystemSettingAdditionalScriptName.String():
@@ -164,11 +154,10 @@ func (s *APIV1Service) GetSystemStatus(c echo.Context) error {
 //	@Success	200	{boolean}	true	"Database vacuumed"
 //	@Failure	401	{object}	nil		"Missing user in session | Unauthorized"
 //	@Failure	500	{object}	nil		"Failed to find user | Failed to ExecVacuum database"
-//	@Security	ApiKeyAuth
 //	@Router		/api/v1/system/vacuum [POST]
 func (s *APIV1Service) ExecVacuum(c echo.Context) error {
 	ctx := c.Request().Context()
-	userID, ok := c.Get(auth.UserIDContextKey).(int32)
+	userID, ok := c.Get(userIDContextKey).(int32)
 	if !ok {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Missing user in session")
 	}

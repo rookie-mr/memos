@@ -13,8 +13,6 @@ interface Setting {
 
 interface LocalSetting {
   enableDoubleClickEditing: boolean;
-  enableAutoCollapse: boolean;
-  dailyReviewTimeOffset: number;
 }
 
 interface UserLocaleSetting {

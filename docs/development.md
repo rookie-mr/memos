@@ -15,22 +15,28 @@ Memos is built with a curated tech stack. It is optimized for developer experien
 
 ## Steps
 
-1. pull source code
+1. Pull the source code
 
    ```bash
    git clone https://github.com/usememos/memos
    ```
 
-2. start backend using air(with live reload)
+2. Start backend server with [`air`](https://github.com/cosmtrek/air) (with live reload)
 
    ```bash
    air -c scripts/.air.toml
    ```
 
-3. start frontend dev server
+3. Install frontend dependencies and generate TypeScript code from protobuf
+
+   ```
+   cd web && pnpm i && pnpm type-gen
+   ```
+
+4. Start the dev server of frontend
 
    ```bash
-   cd web && pnpm i && pnpm dev
+   cd web && pnpm dev
    ```
 
 Memos should now be running at [http://localhost:3001](http://localhost:3001) and change either frontend or backend code would trigger live reload.

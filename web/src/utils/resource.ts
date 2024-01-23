@@ -1,9 +1,11 @@
+import { Resource } from "@/types/proto/api/v2/resource_service";
+
 export const getResourceUrl = (resource: Resource, withOrigin = true) => {
   if (resource.externalLink) {
     return resource.externalLink;
   }
 
-  return `${withOrigin ? window.location.origin : ""}/o/r/${resource.id}`;
+  return `${withOrigin ? window.location.origin : ""}/o/r/${resource.name}`;
 };
 
 export const getResourceType = (resource: Resource) => {

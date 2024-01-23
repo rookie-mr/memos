@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/usememos/memos/common/log"
 	"go.uber.org/zap"
+
+	"github.com/usememos/memos/internal/log"
 )
 
 type Handler interface {
@@ -29,9 +30,9 @@ func NewBotWithHandler(h Handler) *Bot {
 const noTokenWait = 30 * time.Second
 const errRetryWait = 10 * time.Second
 
-// Start start an infinity call of getUpdates from Telegram, call r.MessageHandle while get new message updates.
+// Start start a long polling using getUpdates to get Update, call r.MessageHandle while get new message updates.
 func (b *Bot) Start(ctx context.Context) {
-	var offset int
+	var offset int64
 
 	for {
 		updates, err := b.GetUpdates(ctx, offset)

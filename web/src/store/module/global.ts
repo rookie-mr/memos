@@ -1,4 +1,4 @@
-import axios from "axios";
+import { systemServiceClient } from "@/grpcweb";
 import * as api from "@/helpers/api";
 import storage from "@/helpers/storage";
 import i18n from "@/i18n";
@@ -15,12 +15,11 @@ export const initialGlobalState = async () => {
       disablePasswordLogin: false,
       disablePublicMemos: false,
       maxUploadSizeMiB: 0,
-      autoBackupInterval: 0,
       additionalStyle: "",
       additionalScript: "",
       memoDisplayWithUpdatedTs: false,
       customizedProfile: {
-        name: "memos",
+        name: "Memos",
         logoUrl: "/logo.webp",
         description: "",
         locale: "en",
@@ -30,21 +29,13 @@ export const initialGlobalState = async () => {
     } as SystemStatus,
   };
 
-  const { locale: storageLocale, appearance: storageAppearance } = storage.get(["locale", "appearance"]);
-  if (storageLocale) {
-    defaultGlobalState.locale = storageLocale;
-  }
-  if (storageAppearance) {
-    defaultGlobalState.appearance = storageAppearance;
-  }
-
   const { data } = await api.getSystemStatus();
   if (data) {
     const customizedProfile = data.customizedProfile;
     defaultGlobalState.systemStatus = {
       ...data,
       customizedProfile: {
-        name: customizedProfile.name || "memos",
+        name: customizedProfile.name || "Memos",
         logoUrl: customizedProfile.logoUrl || "/logo.webp",
         description: customizedProfile.description,
         locale: customizedProfile.locale || "en",
@@ -52,9 +43,15 @@ export const initialGlobalState = async () => {
         externalUrl: "",
       },
     };
+    // Use storageLocale > userLocale > customizedProfile.locale (server's default locale)
+    // Initially, storageLocale is undefined and user is not logged in, so use server's default locale.
+    // User can change locale in login/sign up page, set storageLocale and override userLocale after logged in.
+    // Otherwise, storageLocale remains undefined and if userLocale has value after user logged in, set to storageLocale and re-render.
+    // Otherwise, use server's default locale, set to storageLocale.
+    const { locale: storageLocale, appearance: storageAppearance } = storage.get(["locale", "appearance"]);
     defaultGlobalState.locale =
       storageLocale || defaultGlobalState.systemStatus.customizedProfile.locale || findNearestLanguageMatch(i18n.language);
-    defaultGlobalState.appearance = defaultGlobalState.systemStatus.customizedProfile.appearance;
+    defaultGlobalState.appearance = storageAppearance || defaultGlobalState.systemStatus.customizedProfile.appearance;
   }
   store.dispatch(setGlobalState(defaultGlobalState));
 };
@@ -75,11 +72,8 @@ export const useGlobalStore = () => {
     },
     fetchSystemStatus: async () => {
       const { data: systemStatus } = await api.getSystemStatus();
-      // TODO: update this when api v2 is ready.
-      const {
-        data: { systemInfo },
-      } = await axios.get("/api/v2/system/info");
-      systemStatus.dbSize = Number(systemInfo.dbSize);
+      const { systemInfo } = await systemServiceClient.getSystemInfo({});
+      systemStatus.dbSize = systemInfo?.dbSize || 0;
       store.dispatch(setGlobalState({ systemStatus: systemStatus }));
       return systemStatus;
     },
@@ -94,9 +88,17 @@ export const useGlobalStore = () => {
       );
     },
     setLocale: (locale: Locale) => {
+      // Set storageLocale to user selected locale.
+      storage.set({
+        locale: locale,
+      });
       store.dispatch(setLocale(locale));
     },
     setAppearance: (appearance: Appearance) => {
+      // Set storageAppearance to user selected appearance.
+      storage.set({
+        appearance: appearance,
+      });
       store.dispatch(setAppearance(appearance));
     },
   };

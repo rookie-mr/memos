@@ -1,31 +1,31 @@
 # Build frontend dist.
-FROM node:18.12.1-alpine3.16 AS frontend
+FROM node:20-alpine AS frontend
 WORKDIR /frontend-build
 
-COPY ./web/package.json ./web/pnpm-lock.yaml ./
+COPY . .
 
-RUN corepack enable && pnpm i --frozen-lockfile
+WORKDIR /frontend-build/web
 
-COPY ./web/ .
+RUN corepack enable && pnpm i --frozen-lockfile && pnpm type-gen
 
 RUN pnpm build
 
 # Build backend exec file.
-FROM golang:1.19.3-alpine3.16 AS backend
+FROM golang:1.21-alpine AS backend
 WORKDIR /backend-build
 
 COPY . .
-COPY --from=frontend /frontend-build/dist ./server/dist
 
-RUN CGO_ENABLED=0 go build -o memos ./main.go
+RUN CGO_ENABLED=0 go build -o memos ./bin/memos/main.go
 
 # Make workspace with above generated files.
-FROM alpine:3.16 AS monolithic
+FROM alpine:latest AS monolithic
 WORKDIR /usr/local/memos
 
 RUN apk add --no-cache tzdata
 ENV TZ="UTC"
 
+COPY --from=frontend /frontend-build/web/dist /usr/local/memos/dist
 COPY --from=backend /backend-build/memos /usr/local/memos/
 
 EXPOSE 5230
