@@ -14,6 +14,8 @@
     - [ActivityService](#memos-api-v2-ActivityService)
   
 - [api/v2/common.proto](#api_v2_common-proto)
+    - [PageToken](#memos-api-v2-PageToken)
+  
     - [RowStatus](#memos-api-v2-RowStatus)
   
 - [api/v2/user_service.proto](#api_v2_user_service-proto)
@@ -48,6 +50,14 @@
 - [api/v2/auth_service.proto](#api_v2_auth_service-proto)
     - [GetAuthStatusRequest](#memos-api-v2-GetAuthStatusRequest)
     - [GetAuthStatusResponse](#memos-api-v2-GetAuthStatusResponse)
+    - [SignInRequest](#memos-api-v2-SignInRequest)
+    - [SignInResponse](#memos-api-v2-SignInResponse)
+    - [SignInWithSSORequest](#memos-api-v2-SignInWithSSORequest)
+    - [SignInWithSSOResponse](#memos-api-v2-SignInWithSSOResponse)
+    - [SignOutRequest](#memos-api-v2-SignOutRequest)
+    - [SignOutResponse](#memos-api-v2-SignOutResponse)
+    - [SignUpRequest](#memos-api-v2-SignUpRequest)
+    - [SignUpResponse](#memos-api-v2-SignUpResponse)
   
     - [AuthService](#memos-api-v2-AuthService)
   
@@ -65,48 +75,15 @@
   
     - [InboxService](#memos-api-v2-InboxService)
   
-- [api/v2/markdown_service.proto](#api_v2_markdown_service-proto)
-    - [AutoLinkNode](#memos-api-v2-AutoLinkNode)
-    - [BlockquoteNode](#memos-api-v2-BlockquoteNode)
-    - [BoldItalicNode](#memos-api-v2-BoldItalicNode)
-    - [BoldNode](#memos-api-v2-BoldNode)
-    - [CodeBlockNode](#memos-api-v2-CodeBlockNode)
-    - [CodeNode](#memos-api-v2-CodeNode)
-    - [EmbeddedContentNode](#memos-api-v2-EmbeddedContentNode)
-    - [EscapingCharacterNode](#memos-api-v2-EscapingCharacterNode)
-    - [HeadingNode](#memos-api-v2-HeadingNode)
-    - [HighlightNode](#memos-api-v2-HighlightNode)
-    - [HorizontalRuleNode](#memos-api-v2-HorizontalRuleNode)
-    - [ImageNode](#memos-api-v2-ImageNode)
-    - [ItalicNode](#memos-api-v2-ItalicNode)
-    - [LineBreakNode](#memos-api-v2-LineBreakNode)
-    - [LinkNode](#memos-api-v2-LinkNode)
-    - [MathBlockNode](#memos-api-v2-MathBlockNode)
-    - [MathNode](#memos-api-v2-MathNode)
-    - [Node](#memos-api-v2-Node)
-    - [OrderedListNode](#memos-api-v2-OrderedListNode)
-    - [ParagraphNode](#memos-api-v2-ParagraphNode)
-    - [ParseMarkdownRequest](#memos-api-v2-ParseMarkdownRequest)
-    - [ParseMarkdownResponse](#memos-api-v2-ParseMarkdownResponse)
-    - [ReferencedContentNode](#memos-api-v2-ReferencedContentNode)
-    - [StrikethroughNode](#memos-api-v2-StrikethroughNode)
-    - [SubscriptNode](#memos-api-v2-SubscriptNode)
-    - [SuperscriptNode](#memos-api-v2-SuperscriptNode)
-    - [TableNode](#memos-api-v2-TableNode)
-    - [TableNode.Row](#memos-api-v2-TableNode-Row)
-    - [TagNode](#memos-api-v2-TagNode)
-    - [TaskListNode](#memos-api-v2-TaskListNode)
-    - [TextNode](#memos-api-v2-TextNode)
-    - [UnorderedListNode](#memos-api-v2-UnorderedListNode)
-  
-    - [NodeType](#memos-api-v2-NodeType)
-  
-    - [MarkdownService](#memos-api-v2-MarkdownService)
-  
 - [api/v2/memo_relation_service.proto](#api_v2_memo_relation_service-proto)
     - [MemoRelation](#memos-api-v2-MemoRelation)
   
     - [MemoRelation.Type](#memos-api-v2-MemoRelation-Type)
+  
+- [api/v2/reaction_service.proto](#api_v2_reaction_service-proto)
+    - [Reaction](#memos-api-v2-Reaction)
+  
+    - [Reaction.Type](#memos-api-v2-Reaction-Type)
   
 - [api/v2/resource_service.proto](#api_v2_resource_service-proto)
     - [CreateResourceRequest](#memos-api-v2-CreateResourceRequest)
@@ -130,8 +107,12 @@
     - [CreateMemoCommentResponse](#memos-api-v2-CreateMemoCommentResponse)
     - [CreateMemoRequest](#memos-api-v2-CreateMemoRequest)
     - [CreateMemoResponse](#memos-api-v2-CreateMemoResponse)
+    - [DeleteMemoReactionRequest](#memos-api-v2-DeleteMemoReactionRequest)
+    - [DeleteMemoReactionResponse](#memos-api-v2-DeleteMemoReactionResponse)
     - [DeleteMemoRequest](#memos-api-v2-DeleteMemoRequest)
     - [DeleteMemoResponse](#memos-api-v2-DeleteMemoResponse)
+    - [ExportMemosRequest](#memos-api-v2-ExportMemosRequest)
+    - [ExportMemosResponse](#memos-api-v2-ExportMemosResponse)
     - [GetMemoByNameRequest](#memos-api-v2-GetMemoByNameRequest)
     - [GetMemoByNameResponse](#memos-api-v2-GetMemoByNameResponse)
     - [GetMemoRequest](#memos-api-v2-GetMemoRequest)
@@ -141,6 +122,8 @@
     - [GetUserMemosStatsResponse.StatsEntry](#memos-api-v2-GetUserMemosStatsResponse-StatsEntry)
     - [ListMemoCommentsRequest](#memos-api-v2-ListMemoCommentsRequest)
     - [ListMemoCommentsResponse](#memos-api-v2-ListMemoCommentsResponse)
+    - [ListMemoReactionsRequest](#memos-api-v2-ListMemoReactionsRequest)
+    - [ListMemoReactionsResponse](#memos-api-v2-ListMemoReactionsResponse)
     - [ListMemoRelationsRequest](#memos-api-v2-ListMemoRelationsRequest)
     - [ListMemoRelationsResponse](#memos-api-v2-ListMemoRelationsResponse)
     - [ListMemoResourcesRequest](#memos-api-v2-ListMemoResourcesRequest)
@@ -154,27 +137,24 @@
     - [SetMemoResourcesResponse](#memos-api-v2-SetMemoResourcesResponse)
     - [UpdateMemoRequest](#memos-api-v2-UpdateMemoRequest)
     - [UpdateMemoResponse](#memos-api-v2-UpdateMemoResponse)
+    - [UpsertMemoReactionRequest](#memos-api-v2-UpsertMemoReactionRequest)
+    - [UpsertMemoReactionResponse](#memos-api-v2-UpsertMemoReactionResponse)
   
     - [Visibility](#memos-api-v2-Visibility)
   
     - [MemoService](#memos-api-v2-MemoService)
   
-- [api/v2/system_service.proto](#api_v2_system_service-proto)
-    - [GetSystemInfoRequest](#memos-api-v2-GetSystemInfoRequest)
-    - [GetSystemInfoResponse](#memos-api-v2-GetSystemInfoResponse)
-    - [SystemInfo](#memos-api-v2-SystemInfo)
-    - [UpdateSystemInfoRequest](#memos-api-v2-UpdateSystemInfoRequest)
-    - [UpdateSystemInfoResponse](#memos-api-v2-UpdateSystemInfoResponse)
-  
-    - [SystemService](#memos-api-v2-SystemService)
-  
 - [api/v2/tag_service.proto](#api_v2_tag_service-proto)
+    - [BatchUpsertTagRequest](#memos-api-v2-BatchUpsertTagRequest)
+    - [BatchUpsertTagResponse](#memos-api-v2-BatchUpsertTagResponse)
     - [DeleteTagRequest](#memos-api-v2-DeleteTagRequest)
     - [DeleteTagResponse](#memos-api-v2-DeleteTagResponse)
     - [GetTagSuggestionsRequest](#memos-api-v2-GetTagSuggestionsRequest)
     - [GetTagSuggestionsResponse](#memos-api-v2-GetTagSuggestionsResponse)
     - [ListTagsRequest](#memos-api-v2-ListTagsRequest)
     - [ListTagsResponse](#memos-api-v2-ListTagsResponse)
+    - [RenameTagRequest](#memos-api-v2-RenameTagRequest)
+    - [RenameTagResponse](#memos-api-v2-RenameTagResponse)
     - [Tag](#memos-api-v2-Tag)
     - [UpsertTagRequest](#memos-api-v2-UpsertTagRequest)
     - [UpsertTagResponse](#memos-api-v2-UpsertTagResponse)
@@ -195,6 +175,23 @@
     - [Webhook](#memos-api-v2-Webhook)
   
     - [WebhookService](#memos-api-v2-WebhookService)
+  
+- [api/v2/workspace_service.proto](#api_v2_workspace_service-proto)
+    - [GetWorkspaceProfileRequest](#memos-api-v2-GetWorkspaceProfileRequest)
+    - [GetWorkspaceProfileResponse](#memos-api-v2-GetWorkspaceProfileResponse)
+    - [WorkspaceProfile](#memos-api-v2-WorkspaceProfile)
+  
+    - [WorkspaceService](#memos-api-v2-WorkspaceService)
+  
+- [api/v2/workspace_setting_service.proto](#api_v2_workspace_setting_service-proto)
+    - [GetWorkspaceSettingRequest](#memos-api-v2-GetWorkspaceSettingRequest)
+    - [GetWorkspaceSettingResponse](#memos-api-v2-GetWorkspaceSettingResponse)
+    - [SetWorkspaceSettingRequest](#memos-api-v2-SetWorkspaceSettingRequest)
+    - [SetWorkspaceSettingResponse](#memos-api-v2-SetWorkspaceSettingResponse)
+    - [WorkspaceGeneralSetting](#memos-api-v2-WorkspaceGeneralSetting)
+    - [WorkspaceSetting](#memos-api-v2-WorkspaceSetting)
+  
+    - [WorkspaceSettingService](#memos-api-v2-WorkspaceSettingService)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -317,7 +314,7 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetActivity | [GetActivityRequest](#memos-api-v2-GetActivityRequest) | [GetActivityResponse](#memos-api-v2-GetActivityResponse) |  |
+| GetActivity | [GetActivityRequest](#memos-api-v2-GetActivityRequest) | [GetActivityResponse](#memos-api-v2-GetActivityResponse) | GetActivity returns the activity with the given id. |
 
  
 
@@ -327,6 +324,22 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/v2/common.proto
+
+
+
+<a name="memos-api-v2-PageToken"></a>
+
+### PageToken
+Used internally for obfuscating the page token.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| limit | [int32](#int32) |  |  |
+| offset | [int32](#int32) |  |  |
+
+
+
 
 
  
@@ -705,6 +718,7 @@
 | appearance | [string](#string) |  | The preferred appearance of the user. |
 | memo_visibility | [string](#string) |  | The default visibility of the memo. |
 | telegram_user_id | [string](#string) |  | The telegram user id of the user. |
+| compact_view | [bool](#bool) |  | The compact view for a memo. |
 
 
 
@@ -743,8 +757,8 @@
 | CreateUser | [CreateUserRequest](#memos-api-v2-CreateUserRequest) | [CreateUserResponse](#memos-api-v2-CreateUserResponse) | CreateUser creates a new user. |
 | UpdateUser | [UpdateUserRequest](#memos-api-v2-UpdateUserRequest) | [UpdateUserResponse](#memos-api-v2-UpdateUserResponse) | UpdateUser updates a user. |
 | DeleteUser | [DeleteUserRequest](#memos-api-v2-DeleteUserRequest) | [DeleteUserResponse](#memos-api-v2-DeleteUserResponse) | DeleteUser deletes a user. |
-| GetUserSetting | [GetUserSettingRequest](#memos-api-v2-GetUserSettingRequest) | [GetUserSettingResponse](#memos-api-v2-GetUserSettingResponse) |  |
-| UpdateUserSetting | [UpdateUserSettingRequest](#memos-api-v2-UpdateUserSettingRequest) | [UpdateUserSettingResponse](#memos-api-v2-UpdateUserSettingResponse) |  |
+| GetUserSetting | [GetUserSettingRequest](#memos-api-v2-GetUserSettingRequest) | [GetUserSettingResponse](#memos-api-v2-GetUserSettingResponse) | GetUserSetting gets the setting of a user. |
+| UpdateUserSetting | [UpdateUserSettingRequest](#memos-api-v2-UpdateUserSettingRequest) | [UpdateUserSettingResponse](#memos-api-v2-UpdateUserSettingResponse) | UpdateUserSetting updates the setting of a user. |
 | ListUserAccessTokens | [ListUserAccessTokensRequest](#memos-api-v2-ListUserAccessTokensRequest) | [ListUserAccessTokensResponse](#memos-api-v2-ListUserAccessTokensResponse) | ListUserAccessTokens returns a list of access tokens for a user. |
 | CreateUserAccessToken | [CreateUserAccessTokenRequest](#memos-api-v2-CreateUserAccessTokenRequest) | [CreateUserAccessTokenResponse](#memos-api-v2-CreateUserAccessTokenResponse) | CreateUserAccessToken creates a new access token for a user. |
 | DeleteUserAccessToken | [DeleteUserAccessTokenRequest](#memos-api-v2-DeleteUserAccessTokenRequest) | [DeleteUserAccessTokenResponse](#memos-api-v2-DeleteUserAccessTokenResponse) | DeleteUserAccessToken deletes an access token for a user. |
@@ -784,6 +798,121 @@
 
 
 
+
+<a name="memos-api-v2-SignInRequest"></a>
+
+### SignInRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| username | [string](#string) |  |  |
+| password | [string](#string) |  |  |
+| never_expire | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SignInResponse"></a>
+
+### SignInResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user | [User](#memos-api-v2-User) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SignInWithSSORequest"></a>
+
+### SignInWithSSORequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| idp_id | [int32](#int32) |  |  |
+| code | [string](#string) |  |  |
+| redirect_uri | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SignInWithSSOResponse"></a>
+
+### SignInWithSSOResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user | [User](#memos-api-v2-User) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SignOutRequest"></a>
+
+### SignOutRequest
+
+
+
+
+
+
+
+<a name="memos-api-v2-SignOutResponse"></a>
+
+### SignOutResponse
+
+
+
+
+
+
+
+<a name="memos-api-v2-SignUpRequest"></a>
+
+### SignUpRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| username | [string](#string) |  |  |
+| password | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SignUpResponse"></a>
+
+### SignUpResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user | [User](#memos-api-v2-User) |  |  |
+
+
+
+
+
  
 
  
@@ -798,7 +927,11 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetAuthStatus | [GetAuthStatusRequest](#memos-api-v2-GetAuthStatusRequest) | [GetAuthStatusResponse](#memos-api-v2-GetAuthStatusResponse) |  |
+| GetAuthStatus | [GetAuthStatusRequest](#memos-api-v2-GetAuthStatusRequest) | [GetAuthStatusResponse](#memos-api-v2-GetAuthStatusResponse) | GetAuthStatus returns the current auth status of the user. |
+| SignIn | [SignInRequest](#memos-api-v2-SignInRequest) | [SignInResponse](#memos-api-v2-SignInResponse) | SignIn signs in the user with the given username and password. |
+| SignInWithSSO | [SignInWithSSORequest](#memos-api-v2-SignInWithSSORequest) | [SignInWithSSOResponse](#memos-api-v2-SignInWithSSOResponse) | SignInWithSSO signs in the user with the given SSO code. |
+| SignUp | [SignUpRequest](#memos-api-v2-SignUpRequest) | [SignUpResponse](#memos-api-v2-SignUpResponse) | SignUp signs up the user with the given username and password. |
+| SignOut | [SignOutRequest](#memos-api-v2-SignOutRequest) | [SignOutResponse](#memos-api-v2-SignOutResponse) | SignOut signs out the user. |
 
  
 
@@ -819,7 +952,7 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| name | [string](#string) |  | The name of the inbox to delete. Format: inboxes/{inbox} |
+| name | [string](#string) |  | The name of the inbox to delete. Format: inboxes/{uid} |
 
 
 
@@ -844,7 +977,7 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| name | [string](#string) |  | The name of the inbox. Format: inboxes/{id} |
+| name | [string](#string) |  | The name of the inbox. Format: inboxes/{uid} |
 | sender | [string](#string) |  | Format: users/{username} |
 | receiver | [string](#string) |  | Format: users/{username} |
 | status | [Inbox.Status](#memos-api-v2-Inbox-Status) |  |  |
@@ -957,596 +1090,9 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ListInboxes | [ListInboxesRequest](#memos-api-v2-ListInboxesRequest) | [ListInboxesResponse](#memos-api-v2-ListInboxesResponse) |  |
-| UpdateInbox | [UpdateInboxRequest](#memos-api-v2-UpdateInboxRequest) | [UpdateInboxResponse](#memos-api-v2-UpdateInboxResponse) |  |
-| DeleteInbox | [DeleteInboxRequest](#memos-api-v2-DeleteInboxRequest) | [DeleteInboxResponse](#memos-api-v2-DeleteInboxResponse) |  |
-
- 
-
-
-
-<a name="api_v2_markdown_service-proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## api/v2/markdown_service.proto
-
-
-
-<a name="memos-api-v2-AutoLinkNode"></a>
-
-### AutoLinkNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| url | [string](#string) |  |  |
-| is_raw_text | [bool](#bool) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-BlockquoteNode"></a>
-
-### BlockquoteNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-BoldItalicNode"></a>
-
-### BoldItalicNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-BoldNode"></a>
-
-### BoldNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-CodeBlockNode"></a>
-
-### CodeBlockNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| language | [string](#string) |  |  |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-CodeNode"></a>
-
-### CodeNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-EmbeddedContentNode"></a>
-
-### EmbeddedContentNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| resource_name | [string](#string) |  |  |
-| params | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-EscapingCharacterNode"></a>
-
-### EscapingCharacterNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-HeadingNode"></a>
-
-### HeadingNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| level | [int32](#int32) |  |  |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-HighlightNode"></a>
-
-### HighlightNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-HorizontalRuleNode"></a>
-
-### HorizontalRuleNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ImageNode"></a>
-
-### ImageNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| alt_text | [string](#string) |  |  |
-| url | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ItalicNode"></a>
-
-### ItalicNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-LineBreakNode"></a>
-
-### LineBreakNode
-
-
-
-
-
-
-
-<a name="memos-api-v2-LinkNode"></a>
-
-### LinkNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| text | [string](#string) |  |  |
-| url | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-MathBlockNode"></a>
-
-### MathBlockNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-MathNode"></a>
-
-### MathNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-Node"></a>
-
-### Node
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| type | [NodeType](#memos-api-v2-NodeType) |  |  |
-| line_break_node | [LineBreakNode](#memos-api-v2-LineBreakNode) |  |  |
-| paragraph_node | [ParagraphNode](#memos-api-v2-ParagraphNode) |  |  |
-| code_block_node | [CodeBlockNode](#memos-api-v2-CodeBlockNode) |  |  |
-| heading_node | [HeadingNode](#memos-api-v2-HeadingNode) |  |  |
-| horizontal_rule_node | [HorizontalRuleNode](#memos-api-v2-HorizontalRuleNode) |  |  |
-| blockquote_node | [BlockquoteNode](#memos-api-v2-BlockquoteNode) |  |  |
-| ordered_list_node | [OrderedListNode](#memos-api-v2-OrderedListNode) |  |  |
-| unordered_list_node | [UnorderedListNode](#memos-api-v2-UnorderedListNode) |  |  |
-| task_list_node | [TaskListNode](#memos-api-v2-TaskListNode) |  |  |
-| math_block_node | [MathBlockNode](#memos-api-v2-MathBlockNode) |  |  |
-| table_node | [TableNode](#memos-api-v2-TableNode) |  |  |
-| embedded_content_node | [EmbeddedContentNode](#memos-api-v2-EmbeddedContentNode) |  |  |
-| text_node | [TextNode](#memos-api-v2-TextNode) |  |  |
-| bold_node | [BoldNode](#memos-api-v2-BoldNode) |  |  |
-| italic_node | [ItalicNode](#memos-api-v2-ItalicNode) |  |  |
-| bold_italic_node | [BoldItalicNode](#memos-api-v2-BoldItalicNode) |  |  |
-| code_node | [CodeNode](#memos-api-v2-CodeNode) |  |  |
-| image_node | [ImageNode](#memos-api-v2-ImageNode) |  |  |
-| link_node | [LinkNode](#memos-api-v2-LinkNode) |  |  |
-| auto_link_node | [AutoLinkNode](#memos-api-v2-AutoLinkNode) |  |  |
-| tag_node | [TagNode](#memos-api-v2-TagNode) |  |  |
-| strikethrough_node | [StrikethroughNode](#memos-api-v2-StrikethroughNode) |  |  |
-| escaping_character_node | [EscapingCharacterNode](#memos-api-v2-EscapingCharacterNode) |  |  |
-| math_node | [MathNode](#memos-api-v2-MathNode) |  |  |
-| highlight_node | [HighlightNode](#memos-api-v2-HighlightNode) |  |  |
-| subscript_node | [SubscriptNode](#memos-api-v2-SubscriptNode) |  |  |
-| superscript_node | [SuperscriptNode](#memos-api-v2-SuperscriptNode) |  |  |
-| referenced_content_node | [ReferencedContentNode](#memos-api-v2-ReferencedContentNode) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-OrderedListNode"></a>
-
-### OrderedListNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| number | [string](#string) |  |  |
-| indent | [int32](#int32) |  |  |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ParagraphNode"></a>
-
-### ParagraphNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ParseMarkdownRequest"></a>
-
-### ParseMarkdownRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| markdown | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ParseMarkdownResponse"></a>
-
-### ParseMarkdownResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| nodes | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-ReferencedContentNode"></a>
-
-### ReferencedContentNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| resource_name | [string](#string) |  |  |
-| params | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-StrikethroughNode"></a>
-
-### StrikethroughNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-SubscriptNode"></a>
-
-### SubscriptNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-SuperscriptNode"></a>
-
-### SuperscriptNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-TableNode"></a>
-
-### TableNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| header | [string](#string) | repeated |  |
-| delimiter | [string](#string) | repeated |  |
-| rows | [TableNode.Row](#memos-api-v2-TableNode-Row) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-TableNode-Row"></a>
-
-### TableNode.Row
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| cells | [string](#string) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-TagNode"></a>
-
-### TagNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-TaskListNode"></a>
-
-### TaskListNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| indent | [int32](#int32) |  |  |
-| complete | [bool](#bool) |  |  |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
-
-<a name="memos-api-v2-TextNode"></a>
-
-### TextNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| content | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-UnorderedListNode"></a>
-
-### UnorderedListNode
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| symbol | [string](#string) |  |  |
-| indent | [int32](#int32) |  |  |
-| children | [Node](#memos-api-v2-Node) | repeated |  |
-
-
-
-
-
- 
-
-
-<a name="memos-api-v2-NodeType"></a>
-
-### NodeType
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| NODE_UNSPECIFIED | 0 |  |
-| LINE_BREAK | 1 |  |
-| PARAGRAPH | 2 |  |
-| CODE_BLOCK | 3 |  |
-| HEADING | 4 |  |
-| HORIZONTAL_RULE | 5 |  |
-| BLOCKQUOTE | 6 |  |
-| ORDERED_LIST | 7 |  |
-| UNORDERED_LIST | 8 |  |
-| TASK_LIST | 9 |  |
-| MATH_BLOCK | 10 |  |
-| TABLE | 11 |  |
-| EMBEDDED_CONTENT | 12 |  |
-| TEXT | 13 |  |
-| BOLD | 14 |  |
-| ITALIC | 15 |  |
-| BOLD_ITALIC | 16 |  |
-| CODE | 17 |  |
-| IMAGE | 18 |  |
-| LINK | 19 |  |
-| AUTO_LINK | 20 |  |
-| TAG | 21 |  |
-| STRIKETHROUGH | 22 |  |
-| ESCAPING_CHARACTER | 23 |  |
-| MATH | 24 |  |
-| HIGHLIGHT | 25 |  |
-| SUBSCRIPT | 26 |  |
-| SUPERSCRIPT | 27 |  |
-| REFERENCED_CONTENT | 28 |  |
-
-
- 
-
- 
-
-
-<a name="memos-api-v2-MarkdownService"></a>
-
-### MarkdownService
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| ParseMarkdown | [ParseMarkdownRequest](#memos-api-v2-ParseMarkdownRequest) | [ParseMarkdownResponse](#memos-api-v2-ParseMarkdownResponse) |  |
+| ListInboxes | [ListInboxesRequest](#memos-api-v2-ListInboxesRequest) | [ListInboxesResponse](#memos-api-v2-ListInboxesResponse) | ListInboxes lists inboxes for a user. |
+| UpdateInbox | [UpdateInboxRequest](#memos-api-v2-UpdateInboxRequest) | [UpdateInboxResponse](#memos-api-v2-UpdateInboxResponse) | UpdateInbox updates an inbox. |
+| DeleteInbox | [DeleteInboxRequest](#memos-api-v2-DeleteInboxRequest) | [DeleteInboxResponse](#memos-api-v2-DeleteInboxResponse) | DeleteInbox deletes an inbox. |
 
  
 
@@ -1588,6 +1134,63 @@
 | TYPE_UNSPECIFIED | 0 |  |
 | REFERENCE | 1 |  |
 | COMMENT | 2 |  |
+
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="api_v2_reaction_service-proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## api/v2/reaction_service.proto
+
+
+
+<a name="memos-api-v2-Reaction"></a>
+
+### Reaction
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [int32](#int32) |  |  |
+| creator | [string](#string) |  |  |
+| content_id | [string](#string) |  |  |
+| reaction_type | [Reaction.Type](#memos-api-v2-Reaction-Type) |  |  |
+
+
+
+
+
+ 
+
+
+<a name="memos-api-v2-Reaction-Type"></a>
+
+### Reaction.Type
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TYPE_UNSPECIFIED | 0 |  |
+| THUMBS_UP | 1 |  |
+| THUMBS_DOWN | 2 |  |
+| HEART | 3 |  |
+| FIRE | 4 |  |
+| CLAPPING_HANDS | 5 |  |
+| LAUGH | 6 |  |
+| OK_HAND | 7 |  |
+| ROCKET | 8 |  |
+| EYES | 9 |  |
+| THINKING_FACE | 10 |  |
+| CLOWN_FACE | 11 |  |
+| QUESTION_MARK | 12 |  |
 
 
  
@@ -1814,12 +1417,12 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateResource | [CreateResourceRequest](#memos-api-v2-CreateResourceRequest) | [CreateResourceResponse](#memos-api-v2-CreateResourceResponse) |  |
-| ListResources | [ListResourcesRequest](#memos-api-v2-ListResourcesRequest) | [ListResourcesResponse](#memos-api-v2-ListResourcesResponse) |  |
-| GetResource | [GetResourceRequest](#memos-api-v2-GetResourceRequest) | [GetResourceResponse](#memos-api-v2-GetResourceResponse) |  |
-| GetResourceByName | [GetResourceByNameRequest](#memos-api-v2-GetResourceByNameRequest) | [GetResourceByNameResponse](#memos-api-v2-GetResourceByNameResponse) |  |
-| UpdateResource | [UpdateResourceRequest](#memos-api-v2-UpdateResourceRequest) | [UpdateResourceResponse](#memos-api-v2-UpdateResourceResponse) |  |
-| DeleteResource | [DeleteResourceRequest](#memos-api-v2-DeleteResourceRequest) | [DeleteResourceResponse](#memos-api-v2-DeleteResourceResponse) |  |
+| CreateResource | [CreateResourceRequest](#memos-api-v2-CreateResourceRequest) | [CreateResourceResponse](#memos-api-v2-CreateResourceResponse) | CreateResource creates a new resource. |
+| ListResources | [ListResourcesRequest](#memos-api-v2-ListResourcesRequest) | [ListResourcesResponse](#memos-api-v2-ListResourcesResponse) | ListResources lists all resources. |
+| GetResource | [GetResourceRequest](#memos-api-v2-GetResourceRequest) | [GetResourceResponse](#memos-api-v2-GetResourceResponse) | GetResource returns a resource by id. |
+| GetResourceByName | [GetResourceByNameRequest](#memos-api-v2-GetResourceByNameRequest) | [GetResourceByNameResponse](#memos-api-v2-GetResourceByNameResponse) | GetResourceByName returns a resource by name. |
+| UpdateResource | [UpdateResourceRequest](#memos-api-v2-UpdateResourceRequest) | [UpdateResourceResponse](#memos-api-v2-UpdateResourceResponse) | UpdateResource updates a resource. |
+| DeleteResource | [DeleteResourceRequest](#memos-api-v2-DeleteResourceRequest) | [DeleteResourceResponse](#memos-api-v2-DeleteResourceResponse) | DeleteResource deletes a resource by id. |
 
  
 
@@ -1894,6 +1497,32 @@
 
 
 
+<a name="memos-api-v2-DeleteMemoReactionRequest"></a>
+
+### DeleteMemoReactionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [int32](#int32) |  |  |
+| reaction_id | [int32](#int32) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-DeleteMemoReactionResponse"></a>
+
+### DeleteMemoReactionResponse
+
+
+
+
+
+
+
 <a name="memos-api-v2-DeleteMemoRequest"></a>
 
 ### DeleteMemoRequest
@@ -1913,6 +1542,36 @@
 
 ### DeleteMemoResponse
 
+
+
+
+
+
+
+<a name="memos-api-v2-ExportMemosRequest"></a>
+
+### ExportMemosRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| filter | [string](#string) |  | Same as ListMemosRequest.filter |
+
+
+
+
+
+
+<a name="memos-api-v2-ExportMemosResponse"></a>
+
+### ExportMemosResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| content | [bytes](#bytes) |  |  |
 
 
 
@@ -2057,6 +1716,36 @@
 
 
 
+<a name="memos-api-v2-ListMemoReactionsRequest"></a>
+
+### ListMemoReactionsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [int32](#int32) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-ListMemoReactionsResponse"></a>
+
+### ListMemoReactionsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reactions | [Reaction](#memos-api-v2-Reaction) | repeated |  |
+
+
+
+
+
+
 <a name="memos-api-v2-ListMemoRelationsRequest"></a>
 
 ### ListMemoRelationsRequest
@@ -2125,8 +1814,8 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| offset | [int32](#int32) |  | offset is the offset of the first memo to return. |
-| limit | [int32](#int32) |  | limit is the maximum number of memos to return. |
+| page_size | [int32](#int32) |  | The maximum number of memos to return. |
+| page_token | [string](#string) |  | A page token, received from a previous `ListMemos` call. Provide this to retrieve the subsequent page. |
 | filter | [string](#string) |  | Filter is used to filter memos returned in the list. Format: &#34;creator == users/{username} &amp;&amp; visibilities == [&#39;PUBLIC&#39;, &#39;PROTECTED&#39;]&#34; |
 
 
@@ -2143,6 +1832,7 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | memos | [Memo](#memos-api-v2-Memo) | repeated |  |
+| next_page_token | [string](#string) |  | A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages. |
 
 
 
@@ -2166,12 +1856,12 @@
 | update_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | display_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 | content | [string](#string) |  |  |
-| nodes | [Node](#memos-api-v2-Node) | repeated |  |
 | visibility | [Visibility](#memos-api-v2-Visibility) |  |  |
 | pinned | [bool](#bool) |  |  |
 | parent_id | [int32](#int32) | optional |  |
 | resources | [Resource](#memos-api-v2-Resource) | repeated |  |
 | relations | [MemoRelation](#memos-api-v2-MemoRelation) | repeated |  |
+| reactions | [Reaction](#memos-api-v2-Reaction) | repeated |  |
 
 
 
@@ -2238,7 +1928,6 @@
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [int32](#int32) |  |  |
 | memo | [Memo](#memos-api-v2-Memo) |  |  |
 | update_mask | [google.protobuf.FieldMask](#google-protobuf-FieldMask) |  |  |
 
@@ -2256,6 +1945,37 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | memo | [Memo](#memos-api-v2-Memo) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-UpsertMemoReactionRequest"></a>
+
+### UpsertMemoReactionRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [int32](#int32) |  |  |
+| reaction | [Reaction](#memos-api-v2-Reaction) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-UpsertMemoReactionResponse"></a>
+
+### UpsertMemoReactionResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reaction | [Reaction](#memos-api-v2-Reaction) |  |  |
 
 
 
@@ -2295,6 +2015,7 @@
 | GetMemoByName | [GetMemoByNameRequest](#memos-api-v2-GetMemoByNameRequest) | [GetMemoByNameResponse](#memos-api-v2-GetMemoByNameResponse) | GetMemoByName gets a memo by name. |
 | UpdateMemo | [UpdateMemoRequest](#memos-api-v2-UpdateMemoRequest) | [UpdateMemoResponse](#memos-api-v2-UpdateMemoResponse) | UpdateMemo updates a memo. |
 | DeleteMemo | [DeleteMemoRequest](#memos-api-v2-DeleteMemoRequest) | [DeleteMemoResponse](#memos-api-v2-DeleteMemoResponse) | DeleteMemo deletes a memo by id. |
+| ExportMemos | [ExportMemosRequest](#memos-api-v2-ExportMemosRequest) | [ExportMemosResponse](#memos-api-v2-ExportMemosResponse) | ExportMemos exports memos. |
 | SetMemoResources | [SetMemoResourcesRequest](#memos-api-v2-SetMemoResourcesRequest) | [SetMemoResourcesResponse](#memos-api-v2-SetMemoResourcesResponse) | SetMemoResources sets resources for a memo. |
 | ListMemoResources | [ListMemoResourcesRequest](#memos-api-v2-ListMemoResourcesRequest) | [ListMemoResourcesResponse](#memos-api-v2-ListMemoResourcesResponse) | ListMemoResources lists resources for a memo. |
 | SetMemoRelations | [SetMemoRelationsRequest](#memos-api-v2-SetMemoRelationsRequest) | [SetMemoRelationsResponse](#memos-api-v2-SetMemoRelationsResponse) | SetMemoRelations sets relations for a memo. |
@@ -2302,110 +2023,9 @@
 | CreateMemoComment | [CreateMemoCommentRequest](#memos-api-v2-CreateMemoCommentRequest) | [CreateMemoCommentResponse](#memos-api-v2-CreateMemoCommentResponse) | CreateMemoComment creates a comment for a memo. |
 | ListMemoComments | [ListMemoCommentsRequest](#memos-api-v2-ListMemoCommentsRequest) | [ListMemoCommentsResponse](#memos-api-v2-ListMemoCommentsResponse) | ListMemoComments lists comments for a memo. |
 | GetUserMemosStats | [GetUserMemosStatsRequest](#memos-api-v2-GetUserMemosStatsRequest) | [GetUserMemosStatsResponse](#memos-api-v2-GetUserMemosStatsResponse) | GetUserMemosStats gets stats of memos for a user. |
-
- 
-
-
-
-<a name="api_v2_system_service-proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## api/v2/system_service.proto
-
-
-
-<a name="memos-api-v2-GetSystemInfoRequest"></a>
-
-### GetSystemInfoRequest
-
-
-
-
-
-
-
-<a name="memos-api-v2-GetSystemInfoResponse"></a>
-
-### GetSystemInfoResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| system_info | [SystemInfo](#memos-api-v2-SystemInfo) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-SystemInfo"></a>
-
-### SystemInfo
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| version | [string](#string) |  |  |
-| mode | [string](#string) |  |  |
-| allow_registration | [bool](#bool) |  |  |
-| disable_password_login | [bool](#bool) |  |  |
-| additional_script | [string](#string) |  |  |
-| additional_style | [string](#string) |  |  |
-| db_size | [int64](#int64) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-UpdateSystemInfoRequest"></a>
-
-### UpdateSystemInfoRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| system_info | [SystemInfo](#memos-api-v2-SystemInfo) |  | System info is the updated data. |
-| update_mask | [google.protobuf.FieldMask](#google-protobuf-FieldMask) |  |  |
-
-
-
-
-
-
-<a name="memos-api-v2-UpdateSystemInfoResponse"></a>
-
-### UpdateSystemInfoResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| system_info | [SystemInfo](#memos-api-v2-SystemInfo) |  |  |
-
-
-
-
-
- 
-
- 
-
- 
-
-
-<a name="memos-api-v2-SystemService"></a>
-
-### SystemService
-
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| GetSystemInfo | [GetSystemInfoRequest](#memos-api-v2-GetSystemInfoRequest) | [GetSystemInfoResponse](#memos-api-v2-GetSystemInfoResponse) |  |
-| UpdateSystemInfo | [UpdateSystemInfoRequest](#memos-api-v2-UpdateSystemInfoRequest) | [UpdateSystemInfoResponse](#memos-api-v2-UpdateSystemInfoResponse) |  |
+| ListMemoReactions | [ListMemoReactionsRequest](#memos-api-v2-ListMemoReactionsRequest) | [ListMemoReactionsResponse](#memos-api-v2-ListMemoReactionsResponse) | ListMemoReactions lists reactions for a memo. |
+| UpsertMemoReaction | [UpsertMemoReactionRequest](#memos-api-v2-UpsertMemoReactionRequest) | [UpsertMemoReactionResponse](#memos-api-v2-UpsertMemoReactionResponse) | UpsertMemoReaction upserts a reaction for a memo. |
+| DeleteMemoReaction | [DeleteMemoReactionRequest](#memos-api-v2-DeleteMemoReactionRequest) | [DeleteMemoReactionResponse](#memos-api-v2-DeleteMemoReactionResponse) | DeleteMemoReaction deletes a reaction for a memo. |
 
  
 
@@ -2415,6 +2035,31 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/v2/tag_service.proto
+
+
+
+<a name="memos-api-v2-BatchUpsertTagRequest"></a>
+
+### BatchUpsertTagRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| requests | [UpsertTagRequest](#memos-api-v2-UpsertTagRequest) | repeated |  |
+
+
+
+
+
+
+<a name="memos-api-v2-BatchUpsertTagResponse"></a>
+
+### BatchUpsertTagResponse
+
+
+
+
 
 
 
@@ -2503,6 +2148,38 @@
 
 
 
+<a name="memos-api-v2-RenameTagRequest"></a>
+
+### RenameTagRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user | [string](#string) |  | The creator of tags. Format: users/{username} |
+| old_name | [string](#string) |  |  |
+| new_name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-RenameTagResponse"></a>
+
+### RenameTagResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| tag | [Tag](#memos-api-v2-Tag) |  |  |
+
+
+
+
+
+
 <a name="memos-api-v2-Tag"></a>
 
 ### Tag
@@ -2562,10 +2239,12 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| UpsertTag | [UpsertTagRequest](#memos-api-v2-UpsertTagRequest) | [UpsertTagResponse](#memos-api-v2-UpsertTagResponse) |  |
-| ListTags | [ListTagsRequest](#memos-api-v2-ListTagsRequest) | [ListTagsResponse](#memos-api-v2-ListTagsResponse) |  |
-| DeleteTag | [DeleteTagRequest](#memos-api-v2-DeleteTagRequest) | [DeleteTagResponse](#memos-api-v2-DeleteTagResponse) |  |
-| GetTagSuggestions | [GetTagSuggestionsRequest](#memos-api-v2-GetTagSuggestionsRequest) | [GetTagSuggestionsResponse](#memos-api-v2-GetTagSuggestionsResponse) |  |
+| UpsertTag | [UpsertTagRequest](#memos-api-v2-UpsertTagRequest) | [UpsertTagResponse](#memos-api-v2-UpsertTagResponse) | UpsertTag upserts a tag. |
+| BatchUpsertTag | [BatchUpsertTagRequest](#memos-api-v2-BatchUpsertTagRequest) | [BatchUpsertTagResponse](#memos-api-v2-BatchUpsertTagResponse) | BatchUpsertTag upserts multiple tags. |
+| ListTags | [ListTagsRequest](#memos-api-v2-ListTagsRequest) | [ListTagsResponse](#memos-api-v2-ListTagsResponse) | ListTags lists tags. |
+| RenameTag | [RenameTagRequest](#memos-api-v2-RenameTagRequest) | [RenameTagResponse](#memos-api-v2-RenameTagResponse) | RenameTag renames a tag. All related memos will be updated. |
+| DeleteTag | [DeleteTagRequest](#memos-api-v2-DeleteTagRequest) | [DeleteTagResponse](#memos-api-v2-DeleteTagResponse) | DeleteTag deletes a tag. |
+| GetTagSuggestions | [GetTagSuggestionsRequest](#memos-api-v2-GetTagSuggestionsRequest) | [GetTagSuggestionsResponse](#memos-api-v2-GetTagSuggestionsResponse) | GetTagSuggestions gets tag suggestions from the user&#39;s memos. |
 
  
 
@@ -2759,11 +2438,204 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateWebhook | [CreateWebhookRequest](#memos-api-v2-CreateWebhookRequest) | [CreateWebhookResponse](#memos-api-v2-CreateWebhookResponse) |  |
-| GetWebhook | [GetWebhookRequest](#memos-api-v2-GetWebhookRequest) | [GetWebhookResponse](#memos-api-v2-GetWebhookResponse) |  |
-| ListWebhooks | [ListWebhooksRequest](#memos-api-v2-ListWebhooksRequest) | [ListWebhooksResponse](#memos-api-v2-ListWebhooksResponse) |  |
-| UpdateWebhook | [UpdateWebhookRequest](#memos-api-v2-UpdateWebhookRequest) | [UpdateWebhookResponse](#memos-api-v2-UpdateWebhookResponse) |  |
-| DeleteWebhook | [DeleteWebhookRequest](#memos-api-v2-DeleteWebhookRequest) | [DeleteWebhookResponse](#memos-api-v2-DeleteWebhookResponse) |  |
+| CreateWebhook | [CreateWebhookRequest](#memos-api-v2-CreateWebhookRequest) | [CreateWebhookResponse](#memos-api-v2-CreateWebhookResponse) | CreateWebhook creates a new webhook. |
+| GetWebhook | [GetWebhookRequest](#memos-api-v2-GetWebhookRequest) | [GetWebhookResponse](#memos-api-v2-GetWebhookResponse) | GetWebhook returns a webhook by id. |
+| ListWebhooks | [ListWebhooksRequest](#memos-api-v2-ListWebhooksRequest) | [ListWebhooksResponse](#memos-api-v2-ListWebhooksResponse) | ListWebhooks returns a list of webhooks. |
+| UpdateWebhook | [UpdateWebhookRequest](#memos-api-v2-UpdateWebhookRequest) | [UpdateWebhookResponse](#memos-api-v2-UpdateWebhookResponse) | UpdateWebhook updates a webhook. |
+| DeleteWebhook | [DeleteWebhookRequest](#memos-api-v2-DeleteWebhookRequest) | [DeleteWebhookResponse](#memos-api-v2-DeleteWebhookResponse) | DeleteWebhook deletes a webhook by id. |
+
+ 
+
+
+
+<a name="api_v2_workspace_service-proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## api/v2/workspace_service.proto
+
+
+
+<a name="memos-api-v2-GetWorkspaceProfileRequest"></a>
+
+### GetWorkspaceProfileRequest
+
+
+
+
+
+
+
+<a name="memos-api-v2-GetWorkspaceProfileResponse"></a>
+
+### GetWorkspaceProfileResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| workspace_profile | [WorkspaceProfile](#memos-api-v2-WorkspaceProfile) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-WorkspaceProfile"></a>
+
+### WorkspaceProfile
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| version | [string](#string) |  | version is the current version of instance |
+| mode | [string](#string) |  | mode is the instance mode (e.g. &#34;prod&#34;, &#34;dev&#34; or &#34;demo&#34;). |
+| allow_registration | [bool](#bool) |  | allow_registration is whether the registration is allowed. |
+| disable_password_login | [bool](#bool) |  | allow_password_login is whether the password login is allowed. |
+| additional_script | [string](#string) |  | additional_script is the additional script. |
+| additional_style | [string](#string) |  | additional_style is the additional style. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="memos-api-v2-WorkspaceService"></a>
+
+### WorkspaceService
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| GetWorkspaceProfile | [GetWorkspaceProfileRequest](#memos-api-v2-GetWorkspaceProfileRequest) | [GetWorkspaceProfileResponse](#memos-api-v2-GetWorkspaceProfileResponse) | GetWorkspaceProfile returns the workspace profile. |
+
+ 
+
+
+
+<a name="api_v2_workspace_setting_service-proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## api/v2/workspace_setting_service.proto
+
+
+
+<a name="memos-api-v2-GetWorkspaceSettingRequest"></a>
+
+### GetWorkspaceSettingRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | The resource name of the workspace setting. Format: settings/{setting} |
+
+
+
+
+
+
+<a name="memos-api-v2-GetWorkspaceSettingResponse"></a>
+
+### GetWorkspaceSettingResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| setting | [WorkspaceSetting](#memos-api-v2-WorkspaceSetting) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-SetWorkspaceSettingRequest"></a>
+
+### SetWorkspaceSettingRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| setting | [WorkspaceSetting](#memos-api-v2-WorkspaceSetting) |  | setting is the setting to update. |
+
+
+
+
+
+
+<a name="memos-api-v2-SetWorkspaceSettingResponse"></a>
+
+### SetWorkspaceSettingResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| setting | [WorkspaceSetting](#memos-api-v2-WorkspaceSetting) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-WorkspaceGeneralSetting"></a>
+
+### WorkspaceGeneralSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| instance_url | [string](#string) |  | instance_url is the instance URL. |
+| disallow_signup | [bool](#bool) |  | disallow_signup is the flag to disallow signup. |
+| disallow_password_login | [bool](#bool) |  | disallow_password_login is the flag to disallow password login. |
+| additional_script | [string](#string) |  | additional_script is the additional script. |
+| additional_style | [string](#string) |  | additional_style is the additional style. |
+
+
+
+
+
+
+<a name="memos-api-v2-WorkspaceSetting"></a>
+
+### WorkspaceSetting
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | name is the name of the setting. Format: settings/{setting} |
+| general_setting | [WorkspaceGeneralSetting](#memos-api-v2-WorkspaceGeneralSetting) |  | general_setting is the general setting of workspace. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="memos-api-v2-WorkspaceSettingService"></a>
+
+### WorkspaceSettingService
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| GetWorkspaceSetting | [GetWorkspaceSettingRequest](#memos-api-v2-GetWorkspaceSettingRequest) | [GetWorkspaceSettingResponse](#memos-api-v2-GetWorkspaceSettingResponse) | GetWorkspaceSetting returns the setting by name. |
+| SetWorkspaceSetting | [SetWorkspaceSettingRequest](#memos-api-v2-SetWorkspaceSettingRequest) | [SetWorkspaceSettingResponse](#memos-api-v2-SetWorkspaceSettingResponse) | SetWorkspaceSetting updates the setting. |
 
  
 

@@ -24,7 +24,7 @@ service UserService {
   // CreateUser creates a new user.
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      post: "/v1/users"
+      post: "/api/v2/users"
       body: "user"
     };
     option (google.api.method_signature) = "user";
@@ -42,10 +42,12 @@ service UserService {
     option (google.api.http) = {delete: "/api/v2/{name=users/*}"};
     option (google.api.method_signature) = "name";
   }
+  // GetUserSetting gets the setting of a user.
   rpc GetUserSetting(GetUserSettingRequest) returns (GetUserSettingResponse) {
     option (google.api.http) = {get: "/api/v2/{name=users/*}/setting"};
     option (google.api.method_signature) = "name";
   }
+  // UpdateUserSetting updates the setting of a user.
   rpc UpdateUserSetting(UpdateUserSettingRequest) returns (UpdateUserSettingResponse) {
     option (google.api.http) = {
       patch: "/api/v2/{setting.name=users/*/setting}"
@@ -159,6 +161,8 @@ message UserSetting {
   string memo_visibility = 4;
   // The telegram user id of the user.
   string telegram_user_id = 5;
+  // The compact view for a memo.
+  bool compact_view = 6;
 }
 
 message GetUserSettingRequest {

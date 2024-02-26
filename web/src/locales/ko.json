@@ -81,10 +81,6 @@
     "visibility": "공개 범위",
     "yourself": "자기 자신"
   },
-  "daily-review": {
-    "no-memos": "앗, 아무것도 없네요.",
-    "title": "날마다 돌아보기"
-  },
   "days": {
     "fri": "금",
     "mon": "월",
@@ -355,7 +351,7 @@
       "telegram-bot-token-placeholder": "서버의 텔레그램 봇 토큰"
     }
   },
-  "tag-list": {
+  "tag": {
     "all-tags": "모든 태그",
     "create-tag": "태그 생성",
     "hide": "숨기기",

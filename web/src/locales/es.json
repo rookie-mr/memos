@@ -80,7 +80,7 @@
       "disabled": "Las notas públicas están deshabilitadas"
     }
   },
-  "tag-list": {
+  "tag": {
     "tip-text": "Escribe '#etiqueta' para crearlo"
   },
   "setting": {
@@ -92,7 +92,8 @@
     "account-section": {
       "title": "Información de la Cuenta",
       "update-information": "Actualizar Información",
-      "change-password": "Cambiar Contraseña"
+      "change-password": "Cambiar Contraseña",
+      "export-memos": "Exportar Notas"
     },
     "preference-section": {
       "theme": "Tema",

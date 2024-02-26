@@ -199,7 +199,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_usememos_memos_api_v1.IdentityProvider"
+                                "$ref": "#/definitions/api_v1.IdentityProvider"
                             }
                         }
                     },
@@ -226,7 +226,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.CreateIdentityProviderRequest"
+                            "$ref": "#/definitions/api_v1.CreateIdentityProviderRequest"
                         }
                     }
                 ],
@@ -354,7 +354,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.UpdateIdentityProviderRequest"
+                            "$ref": "#/definitions/api_v1.UpdateIdentityProviderRequest"
                         }
                     }
                 ],
@@ -838,7 +838,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_v1.UpsertMemoRelationRequest"
+                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.UpsertMemoRelationRequest"
                         }
                     }
                 ],
@@ -992,7 +992,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.CreateResourceRequest"
+                            "$ref": "#/definitions/api_v1.CreateResourceRequest"
                         }
                     }
                 ],
@@ -1116,7 +1116,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.UpdateResourceRequest"
+                            "$ref": "#/definitions/api_v1.UpdateResourceRequest"
                         }
                     }
                 ],
@@ -1155,7 +1155,7 @@ const docTemplate = `{
                     "200": {
                         "description": "System GetSystemStatus",
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.SystemStatus"
+                            "$ref": "#/definitions/api_v1.SystemStatus"
                         }
                     },
                     "401": {
@@ -1366,12 +1366,6 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Created system setting",
-                        "schema": {
-                            "$ref": "#/definitions/store.SystemSetting"
-                        }
-                    },
                     "400": {
                         "description": "Malformatted post system setting request | invalid system setting"
                     },
@@ -1592,7 +1586,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.CreateUserRequest"
+                            "$ref": "#/definitions/api_v1.CreateUserRequest"
                         }
                     }
                 ],
@@ -1773,7 +1767,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_usememos_memos_api_v1.UpdateUserRequest"
+                            "$ref": "#/definitions/api_v1.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1795,25 +1789,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to find user | Failed to generate password hash | Failed to patch user | Failed to find userSettingList"
-                    }
-                }
-            }
-        },
-        "/explore/rss.xml": {
-            "get": {
-                "produces": [
-                    "text/xml"
-                ],
-                "tags": [
-                    "rss"
-                ],
-                "summary": "Get RSS",
-                "responses": {
-                    "200": {
-                        "description": "RSS"
-                    },
-                    "500": {
-                        "description": "Failed to get system customized profile | Failed to find memo list | Failed to generate rss"
                     }
                 }
             }
@@ -1845,37 +1820,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to write GetImage blob"
-                    }
-                }
-            }
-        },
-        "/u/{id}/rss.xml": {
-            "get": {
-                "produces": [
-                    "text/xml"
-                ],
-                "tags": [
-                    "rss"
-                ],
-                "summary": "Get RSS for a user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "RSS"
-                    },
-                    "400": {
-                        "description": "User id is not a number"
-                    },
-                    "500": {
-                        "description": "Failed to get system customized profile | Failed to find memo list | Failed to generate rss"
                     }
                 }
             }
@@ -1988,10 +1932,6 @@ const docTemplate = `{
                 },
                 "description": {
                     "description": "Description is the server description.",
-                    "type": "string"
-                },
-                "externalUrl": {
-                    "description": "ExternalURL is the external url of server. e.g. https://usermemos.com",
                     "type": "string"
                 },
                 "locale": {
@@ -2228,6 +2168,9 @@ const docTemplate = `{
                 "path": {
                     "type": "string"
                 },
+                "presign": {
+                    "type": "boolean"
+                },
                 "region": {
                     "type": "string"
                 },
@@ -2271,34 +2214,24 @@ const docTemplate = `{
             "enum": [
                 "server-id",
                 "secret-session",
-                "allow-signup",
-                "disable-password-login",
                 "disable-public-memos",
                 "max-upload-size-mib",
-                "additional-style",
-                "additional-script",
                 "customized-profile",
                 "storage-service-id",
                 "local-storage-path",
                 "telegram-bot-token",
-                "memo-display-with-updated-ts",
-                "instance-url"
+                "memo-display-with-updated-ts"
             ],
             "x-enum-varnames": [
                 "SystemSettingServerIDName",
                 "SystemSettingSecretSessionName",
-                "SystemSettingAllowSignUpName",
-                "SystemSettingDisablePasswordLoginName",
                 "SystemSettingDisablePublicMemosName",
                 "SystemSettingMaxUploadSizeMiBName",
-                "SystemSettingAdditionalStyleName",
-                "SystemSettingAdditionalScriptName",
                 "SystemSettingCustomizedProfileName",
                 "SystemSettingStorageServiceIDName",
                 "SystemSettingLocalStoragePathName",
                 "SystemSettingTelegramBotTokenName",
-                "SystemSettingMemoDisplayWithUpdatedTsName",
-                "SystemSettingInstanceURLName"
+                "SystemSettingMemoDisplayWithUpdatedTsName"
             ]
         },
         "api_v1.SystemStatus": {
@@ -2621,10 +2554,6 @@ const docTemplate = `{
                     "description": "Description is the server description.",
                     "type": "string"
                 },
-                "externalUrl": {
-                    "description": "ExternalURL is the external url of server. e.g. https://usermemos.com",
-                    "type": "string"
-                },
                 "locale": {
                     "description": "Locale is the server default locale.",
                     "type": "string"
@@ -2859,6 +2788,9 @@ const docTemplate = `{
                 "path": {
                     "type": "string"
                 },
+                "presign": {
+                    "type": "boolean"
+                },
                 "region": {
                     "type": "string"
                 },
@@ -2902,34 +2834,24 @@ const docTemplate = `{
             "enum": [
                 "server-id",
                 "secret-session",
-                "allow-signup",
-                "disable-password-login",
                 "disable-public-memos",
                 "max-upload-size-mib",
-                "additional-style",
-                "additional-script",
                 "customized-profile",
                 "storage-service-id",
                 "local-storage-path",
                 "telegram-bot-token",
-                "memo-display-with-updated-ts",
-                "instance-url"
+                "memo-display-with-updated-ts"
             ],
             "x-enum-varnames": [
                 "SystemSettingServerIDName",
                 "SystemSettingSecretSessionName",
-                "SystemSettingAllowSignUpName",
-                "SystemSettingDisablePasswordLoginName",
                 "SystemSettingDisablePublicMemosName",
                 "SystemSettingMaxUploadSizeMiBName",
-                "SystemSettingAdditionalStyleName",
-                "SystemSettingAdditionalScriptName",
                 "SystemSettingCustomizedProfileName",
                 "SystemSettingStorageServiceIDName",
                 "SystemSettingLocalStoragePathName",
                 "SystemSettingTelegramBotTokenName",
-                "SystemSettingMemoDisplayWithUpdatedTsName",
-                "SystemSettingInstanceURLName"
+                "SystemSettingMemoDisplayWithUpdatedTsName"
             ]
         },
         "github_com_usememos_memos_api_v1.SystemStatus": {
@@ -3253,9 +3175,15 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "parentID": {
+                    "type": "integer"
+                },
                 "pinned": {
                     "description": "Composed fields",
                     "type": "boolean"
+                },
+                "resourceName": {
+                    "type": "string"
                 },
                 "rowStatus": {
                     "description": "Standard fields",
@@ -3330,6 +3258,9 @@ const docTemplate = `{
                 "memoID": {
                     "type": "integer"
                 },
+                "resourceName": {
+                    "type": "string"
+                },
                 "size": {
                     "type": "integer"
                 },
@@ -3378,20 +3309,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "store.SystemSetting": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "value": {
                     "type": "string"
                 }
             }

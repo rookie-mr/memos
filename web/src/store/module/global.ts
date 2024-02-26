@@ -1,4 +1,3 @@
-import { systemServiceClient } from "@/grpcweb";
 import * as api from "@/helpers/api";
 import storage from "@/helpers/storage";
 import i18n from "@/i18n";
@@ -11,12 +10,9 @@ export const initialGlobalState = async () => {
     locale: "en" as Locale,
     appearance: "system" as Appearance,
     systemStatus: {
-      allowSignUp: false,
       disablePasswordLogin: false,
       disablePublicMemos: false,
       maxUploadSizeMiB: 0,
-      additionalStyle: "",
-      additionalScript: "",
       memoDisplayWithUpdatedTs: false,
       customizedProfile: {
         name: "Memos",
@@ -24,7 +20,6 @@ export const initialGlobalState = async () => {
         description: "",
         locale: "en",
         appearance: "system",
-        externalUrl: "",
       },
     } as SystemStatus,
   };
@@ -40,7 +35,6 @@ export const initialGlobalState = async () => {
         description: customizedProfile.description,
         locale: customizedProfile.locale || "en",
         appearance: customizedProfile.appearance || "system",
-        externalUrl: "",
       },
     };
     // Use storageLocale > userLocale > customizedProfile.locale (server's default locale)
@@ -72,8 +66,6 @@ export const useGlobalStore = () => {
     },
     fetchSystemStatus: async () => {
       const { data: systemStatus } = await api.getSystemStatus();
-      const { systemInfo } = await systemServiceClient.getSystemInfo({});
-      systemStatus.dbSize = systemInfo?.dbSize || 0;
       store.dispatch(setGlobalState({ systemStatus: systemStatus }));
       return systemStatus;
     },
@@ -84,7 +76,7 @@ export const useGlobalStore = () => {
             ...state.systemStatus,
             ...systemStatus,
           },
-        })
+        }),
       );
     },
     setLocale: (locale: Locale) => {

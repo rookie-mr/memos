@@ -3,8 +3,8 @@ syntax = "proto3";
 package memos.api.v2;
 
 import "api/v2/common.proto";
-import "api/v2/markdown_service.proto";
 import "api/v2/memo_relation_service.proto";
+import "api/v2/reaction_service.proto";
 import "api/v2/resource_service.proto";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
@@ -33,21 +33,25 @@ service MemoService {
   }
   // GetMemoByName gets a memo by name.
   rpc GetMemoByName(GetMemoByNameRequest) returns (GetMemoByNameResponse) {
-    option (google.api.http) = {get: "/api/v2/memos/{name}"};
+    option (google.api.http) = {get: "/api/v2/memos/name/{name}"};
     option (google.api.method_signature) = "name";
   }
   // UpdateMemo updates a memo.
   rpc UpdateMemo(UpdateMemoRequest) returns (UpdateMemoResponse) {
     option (google.api.http) = {
-      patch: "/api/v2/memos/{id}"
-      body: "*"
+      patch: "/api/v2/memos/{memo.id}"
+      body: "memo"
     };
-    option (google.api.method_signature) = "id, update_mask";
+    option (google.api.method_signature) = "memo,update_mask";
   }
   // DeleteMemo deletes a memo by id.
   rpc DeleteMemo(DeleteMemoRequest) returns (DeleteMemoResponse) {
     option (google.api.http) = {delete: "/api/v2/memos/{id}"};
     option (google.api.method_signature) = "id";
+  }
+  // ExportMemos exports memos.
+  rpc ExportMemos(ExportMemosRequest) returns (ExportMemosResponse) {
+    option (google.api.http) = {post: "/api/v2/memos:export"};
   }
   // SetMemoResources sets resources for a memo.
   rpc SetMemoResources(SetMemoResourcesRequest) returns (SetMemoResourcesResponse) {
@@ -90,6 +94,21 @@ service MemoService {
     option (google.api.http) = {get: "/api/v2/memos/stats"};
     option (google.api.method_signature) = "username";
   }
+  // ListMemoReactions lists reactions for a memo.
+  rpc ListMemoReactions(ListMemoReactionsRequest) returns (ListMemoReactionsResponse) {
+    option (google.api.http) = {get: "/api/v2/memos/{id}/reactions"};
+    option (google.api.method_signature) = "id";
+  }
+  // UpsertMemoReaction upserts a reaction for a memo.
+  rpc UpsertMemoReaction(UpsertMemoReactionRequest) returns (UpsertMemoReactionResponse) {
+    option (google.api.http) = {post: "/api/v2/memos/{id}/reactions"};
+    option (google.api.method_signature) = "id";
+  }
+  // DeleteMemoReaction deletes a reaction for a memo.
+  rpc DeleteMemoReaction(DeleteMemoReactionRequest) returns (DeleteMemoReactionResponse) {
+    option (google.api.http) = {delete: "/api/v2/memos/{id}/reactions/{reaction_id}"};
+    option (google.api.method_signature) = "id,reaction_id";
+  }
 }
 
 enum Visibility {
@@ -125,17 +144,17 @@ message Memo {
 
   string content = 9;
 
-  repeated Node nodes = 10;
+  Visibility visibility = 10;
 
-  Visibility visibility = 11;
+  bool pinned = 11;
 
-  bool pinned = 12;
+  optional int32 parent_id = 12 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  optional int32 parent_id = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
+  repeated Resource resources = 13 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  repeated Resource resources = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
+  repeated MemoRelation relations = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  repeated MemoRelation relations = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+  repeated Reaction reactions = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
 }
 
 message CreateMemoRequest {
@@ -149,11 +168,12 @@ message CreateMemoResponse {
 }
 
 message ListMemosRequest {
-  // offset is the offset of the first memo to return.
-  int32 offset = 1;
+  // The maximum number of memos to return.
+  int32 page_size = 1;
 
-  // limit is the maximum number of memos to return.
-  int32 limit = 2;
+  // A page token, received from a previous `ListMemos` call.
+  // Provide this to retrieve the subsequent page.
+  string page_token = 2;
 
   // Filter is used to filter memos returned in the list.
   // Format: "creator == users/{username} && visibilities == ['PUBLIC', 'PROTECTED']"
@@ -162,6 +182,10 @@ message ListMemosRequest {
 
 message ListMemosResponse {
   repeated Memo memos = 1;
+
+  // A token, which can be sent as `page_token` to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
+  string next_page_token = 2;
 }
 
 message GetMemoRequest {
@@ -181,11 +205,9 @@ message GetMemoByNameResponse {
 }
 
 message UpdateMemoRequest {
-  int32 id = 1;
+  Memo memo = 1;
 
-  Memo memo = 2;
-
-  google.protobuf.FieldMask update_mask = 3;
+  google.protobuf.FieldMask update_mask = 2;
 }
 
 message UpdateMemoResponse {
@@ -197,6 +219,15 @@ message DeleteMemoRequest {
 }
 
 message DeleteMemoResponse {}
+
+message ExportMemosRequest {
+  // Same as ListMemosRequest.filter
+  string filter = 1;
+}
+
+message ExportMemosResponse {
+  bytes content = 1;
+}
 
 message SetMemoResourcesRequest {
   int32 id = 1;
@@ -268,3 +299,29 @@ message GetUserMemosStatsResponse {
   // key is the year-month-day string. e.g. "2020-01-01".
   map<string, int32> stats = 1;
 }
+
+message ListMemoReactionsRequest {
+  int32 id = 1;
+}
+
+message ListMemoReactionsResponse {
+  repeated Reaction reactions = 1;
+}
+
+message UpsertMemoReactionRequest {
+  int32 id = 1;
+
+  Reaction reaction = 2;
+}
+
+message UpsertMemoReactionResponse {
+  Reaction reaction = 1;
+}
+
+message DeleteMemoReactionRequest {
+  int32 id = 1;
+
+  int32 reaction_id = 2;
+}
+
+message DeleteMemoReactionResponse {}

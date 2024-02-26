@@ -2,55 +2,60 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"os"
-	"time"
-
-	"strings"
 
 	"github.com/pkg/errors"
 
-	"github.com/usememos/memos/internal/log"
+	storepb "github.com/usememos/memos/proto/gen/store"
 )
 
-// MigrateResourceInternalPath migrates resource internal path from absolute path to relative path.
-func (s *Store) MigrateResourceInternalPath(ctx context.Context) error {
-	resources, err := s.ListResources(ctx, &FindResource{})
+// MigrateWorkspaceSetting migrates workspace setting from v1 to v2.
+func (s *Store) MigrateWorkspaceSetting(ctx context.Context) error {
+	workspaceSettings, err := s.ListWorkspaceSettings(ctx, &FindWorkspaceSetting{})
 	if err != nil {
-		return errors.Wrap(err, "failed to list resources")
+		return errors.Wrap(err, "failed to list workspace settings")
 	}
 
-	dataPath := strings.ReplaceAll(s.Profile.Data, `\`, "/")
-	migrateStartTime := time.Now()
-	migratedCount := 0
-	for _, resource := range resources {
-		if resource.InternalPath == "" {
-			continue
-		}
-
-		internalPath := strings.ReplaceAll(resource.InternalPath, `\`, "/")
-		if !strings.HasPrefix(internalPath, dataPath) {
-			continue
-		}
-
-		internalPath = strings.TrimPrefix(internalPath, dataPath)
-
-		for os.IsPathSeparator(internalPath[0]) {
-			internalPath = internalPath[1:]
-		}
-
-		_, err := s.UpdateResource(ctx, &UpdateResource{
-			ID:           resource.ID,
-			InternalPath: &internalPath,
-		})
-		if err != nil {
-			return errors.Wrap(err, "failed to update local resource path")
-		}
-		migratedCount++
+	workspaceGeneralSetting, err := s.GetWorkspaceGeneralSetting(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to get workspace general setting")
 	}
 
-	if migratedCount > 0 && s.Profile.Mode == "prod" {
-		log.Info(fmt.Sprintf("migrated %d local resource paths in %s", migratedCount, time.Since(migrateStartTime)))
+	for _, workspaceSetting := range workspaceSettings {
+		matched := true
+		var baseValue any
+		// nolint
+		json.Unmarshal([]byte(workspaceSetting.Value), &baseValue)
+		if workspaceSetting.Name == "allow-signup" {
+			workspaceGeneralSetting.DisallowSignup = !baseValue.(bool)
+		} else if workspaceSetting.Name == "disable-password-login" {
+			workspaceGeneralSetting.DisallowPasswordLogin = baseValue.(bool)
+		} else if workspaceSetting.Name == "additional-style" {
+			workspaceGeneralSetting.AdditionalStyle = baseValue.(string)
+		} else if workspaceSetting.Name == "additional-script" {
+			workspaceGeneralSetting.AdditionalScript = baseValue.(string)
+		} else if workspaceSetting.Name == "instance-url" {
+			workspaceGeneralSetting.InstanceUrl = workspaceSetting.Value
+		} else {
+			matched = false
+		}
+
+		if matched {
+			if err := s.DeleteWorkspaceSetting(ctx, &DeleteWorkspaceSetting{
+				Name: workspaceSetting.Name,
+			}); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("failed to delete workspace setting: %s", workspaceSetting.Name))
+			}
+		}
 	}
+
+	if _, err := s.UpsertWorkspaceSettingV1(ctx, &storepb.WorkspaceSetting{
+		Key:   storepb.WorkspaceSettingKey_WORKSPACE_SETTING_GENERAL,
+		Value: &storepb.WorkspaceSetting_General{General: workspaceGeneralSetting},
+	}); err != nil {
+		return errors.Wrap(err, "failed to upsert workspace general setting")
+	}
+
 	return nil
 }

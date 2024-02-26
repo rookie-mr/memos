@@ -17,7 +17,6 @@ import (
 	"github.com/usememos/memos/internal/util"
 	"github.com/usememos/memos/plugin/webhook"
 	storepb "github.com/usememos/memos/proto/gen/store"
-	"github.com/usememos/memos/server/service/metric"
 	"github.com/usememos/memos/store"
 )
 
@@ -46,7 +45,8 @@ func (v Visibility) String() string {
 }
 
 type Memo struct {
-	ID int32 `json:"id"`
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 
 	// Standard fields
 	RowStatus RowStatus `json:"rowStatus"`
@@ -276,7 +276,7 @@ func (s *APIV1Service) CreateMemo(c echo.Context) error {
 	}
 
 	// Find disable public memos system setting.
-	disablePublicMemosSystemSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+	disablePublicMemosSystemSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Name: SystemSettingDisablePublicMemosName.String(),
 	})
 	if err != nil {
@@ -350,7 +350,6 @@ func (s *APIV1Service) CreateMemo(c echo.Context) error {
 				if err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create activity").SetInternal(err)
 				}
-				metric.Enqueue("memo comment create")
 				if _, err := s.Store.CreateInbox(ctx, &store.Inbox{
 					SenderID:   memo.CreatorID,
 					ReceiverID: relatedMemo.CreatorID,
@@ -409,7 +408,6 @@ func (s *APIV1Service) CreateMemo(c echo.Context) error {
 		log.Warn("Failed to dispatch memo created webhook", zap.Error(err))
 	}
 
-	metric.Enqueue("memo create")
 	return c.JSON(http.StatusOK, memoResponse)
 }
 
@@ -713,7 +711,7 @@ func (s *APIV1Service) UpdateMemo(c echo.Context) error {
 		visibility := store.Visibility(patchMemoRequest.Visibility.String())
 		updateMemoMessage.Visibility = &visibility
 		// Find disable public memos system setting.
-		disablePublicMemosSystemSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+		disablePublicMemosSystemSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 			Name: SystemSettingDisablePublicMemosName.String(),
 		})
 		if err != nil {
@@ -832,6 +830,7 @@ func (s *APIV1Service) UpdateMemo(c echo.Context) error {
 func (s *APIV1Service) convertMemoFromStore(ctx context.Context, memo *store.Memo) (*Memo, error) {
 	memoMessage := &Memo{
 		ID:         memo.ID,
+		Name:       memo.ResourceName,
 		RowStatus:  RowStatus(memo.RowStatus.String()),
 		CreatorID:  memo.CreatorID,
 		CreatedTs:  memo.CreatedTs,
@@ -903,7 +902,7 @@ func (s *APIV1Service) convertMemoFromStore(ctx context.Context, memo *store.Mem
 }
 
 func (s *APIV1Service) getMemoDisplayWithUpdatedTsSettingValue(ctx context.Context) (bool, error) {
-	memoDisplayWithUpdatedTsSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+	memoDisplayWithUpdatedTsSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Name: SystemSettingMemoDisplayWithUpdatedTsName.String(),
 	})
 	if err != nil {
@@ -1009,7 +1008,6 @@ func (s *APIV1Service) dispatchMemoRelatedWebhook(ctx context.Context, memo *Mem
 	if err != nil {
 		return err
 	}
-	metric.Enqueue("webhook dispatch")
 	for _, hook := range webhooks {
 		payload := convertMemoToWebhookPayload(memo)
 		payload.ActivityType = activityType

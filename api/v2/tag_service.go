@@ -3,11 +3,14 @@ package v2
 import (
 	"context"
 	"fmt"
-	"regexp"
+	"slices"
 	"sort"
 
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
+	"github.com/yourselfhosted/gomark/ast"
+	"github.com/yourselfhosted/gomark/parser"
+	"github.com/yourselfhosted/gomark/parser/tokenizer"
+	"github.com/yourselfhosted/gomark/restore"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -36,6 +39,15 @@ func (s *APIV2Service) UpsertTag(ctx context.Context, request *apiv2pb.UpsertTag
 	return &apiv2pb.UpsertTagResponse{
 		Tag: t,
 	}, nil
+}
+
+func (s *APIV2Service) BatchUpsertTag(ctx context.Context, request *apiv2pb.BatchUpsertTagRequest) (*apiv2pb.BatchUpsertTagResponse, error) {
+	for _, r := range request.Requests {
+		if _, err := s.UpsertTag(ctx, r); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to batch upsert tags: %v", err)
+		}
+	}
+	return &apiv2pb.BatchUpsertTagResponse{}, nil
 }
 
 func (s *APIV2Service) ListTags(ctx context.Context, request *apiv2pb.ListTagsRequest) (*apiv2pb.ListTagsResponse, error) {
@@ -68,6 +80,71 @@ func (s *APIV2Service) ListTags(ctx context.Context, request *apiv2pb.ListTagsRe
 		response.Tags = append(response.Tags, t)
 	}
 	return response, nil
+}
+
+func (s *APIV2Service) RenameTag(ctx context.Context, request *apiv2pb.RenameTagRequest) (*apiv2pb.RenameTagResponse, error) {
+	username, err := ExtractUsernameFromName(request.User)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid username: %v", err)
+	}
+	user, err := s.Store.GetUser(ctx, &store.FindUser{
+		Username: &username,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get user: %v", err)
+	}
+	if user == nil {
+		return nil, status.Errorf(codes.NotFound, "user not found")
+	}
+
+	// Find all related memos.
+	memos, err := s.Store.ListMemos(ctx, &store.FindMemo{
+		CreatorID:     &user.ID,
+		ContentSearch: []string{fmt.Sprintf("#%s", request.OldName)},
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to list memos: %v", err)
+	}
+	// Replace tag name in memo content.
+	for _, memo := range memos {
+		nodes, err := parser.Parse(tokenizer.Tokenize(memo.Content))
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse memo: %v", err)
+		}
+		traverseASTNodes(nodes, func(node ast.Node) {
+			if tag, ok := node.(*ast.Tag); ok && tag.Content == request.OldName {
+				tag.Content = request.NewName
+			}
+		})
+		content := restore.Restore(nodes)
+		if err := s.Store.UpdateMemo(ctx, &store.UpdateMemo{
+			ID:      memo.ID,
+			Content: &content,
+		}); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to update memo: %v", err)
+		}
+	}
+
+	// Delete old tag and create new tag.
+	if err := s.Store.DeleteTag(ctx, &store.DeleteTag{
+		CreatorID: user.ID,
+		Name:      request.OldName,
+	}); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete tag: %v", err)
+	}
+	tag, err := s.Store.UpsertTag(ctx, &store.Tag{
+		CreatorID: user.ID,
+		Name:      request.NewName,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to upsert tag: %v", err)
+	}
+
+	tagMessage, err := s.convertTagFromStore(ctx, tag)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to convert tag: %v", err)
+	}
+	return &apiv2pb.RenameTagResponse{Tag: tagMessage}, nil
 }
 
 func (s *APIV2Service) DeleteTag(ctx context.Context, request *apiv2pb.DeleteTagRequest) (*apiv2pb.DeleteTagResponse, error) {
@@ -114,7 +191,7 @@ func (s *APIV2Service) GetTagSuggestions(ctx context.Context, request *apiv2pb.G
 		ContentSearch: []string{"#"},
 		RowStatus:     &normalRowStatus,
 	}
-	memoList, err := s.Store.ListMemos(ctx, memoFind)
+	memos, err := s.Store.ListMemos(ctx, memoFind)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list memos: %v", err)
 	}
@@ -131,12 +208,21 @@ func (s *APIV2Service) GetTagSuggestions(ctx context.Context, request *apiv2pb.G
 		tagNameList = append(tagNameList, tag.Name)
 	}
 	tagMapSet := make(map[string]bool)
-	for _, memo := range memoList {
-		for _, tag := range findTagListFromMemoContent(memo.Content) {
-			if !slices.Contains(tagNameList, tag) {
-				tagMapSet[tag] = true
-			}
+	for _, memo := range memos {
+		nodes, err := parser.Parse(tokenizer.Tokenize(memo.Content))
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to parse memo content")
 		}
+
+		// Dynamically upsert tags from memo content.
+		traverseASTNodes(nodes, func(node ast.Node) {
+			if tagNode, ok := node.(*ast.Tag); ok {
+				tag := tagNode.Content
+				if !slices.Contains(tagNameList, tag) {
+					tagMapSet[tag] = true
+				}
+			}
+		})
 	}
 	suggestions := []string{}
 	for tag := range tagMapSet {
@@ -162,20 +248,24 @@ func (s *APIV2Service) convertTagFromStore(ctx context.Context, tag *store.Tag) 
 	}, nil
 }
 
-var tagRegexp = regexp.MustCompile(`#([^\s#,]+)`)
-
-func findTagListFromMemoContent(memoContent string) []string {
-	tagMapSet := make(map[string]bool)
-	matches := tagRegexp.FindAllStringSubmatch(memoContent, -1)
-	for _, v := range matches {
-		tagName := v[1]
-		tagMapSet[tagName] = true
+func traverseASTNodes(nodes []ast.Node, fn func(ast.Node)) {
+	for _, node := range nodes {
+		fn(node)
+		switch n := node.(type) {
+		case *ast.Paragraph:
+			traverseASTNodes(n.Children, fn)
+		case *ast.Heading:
+			traverseASTNodes(n.Children, fn)
+		case *ast.Blockquote:
+			traverseASTNodes(n.Children, fn)
+		case *ast.OrderedList:
+			traverseASTNodes(n.Children, fn)
+		case *ast.UnorderedList:
+			traverseASTNodes(n.Children, fn)
+		case *ast.TaskList:
+			traverseASTNodes(n.Children, fn)
+		case *ast.Bold:
+			traverseASTNodes(n.Children, fn)
+		}
 	}
-
-	tagList := []string{}
-	for tag := range tagMapSet {
-		tagList = append(tagList, tag)
-	}
-	sort.Strings(tagList)
-	return tagList
 }

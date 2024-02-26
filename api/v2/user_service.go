@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -130,6 +130,10 @@ func (s *APIV2Service) UpdateUser(ctx context.Context, request *apiv2pb.UpdateUs
 		return nil, status.Errorf(codes.NotFound, "user not found")
 	}
 
+	if s.Profile.Mode == "demo" && user.Username == "memos-demo" {
+		return nil, status.Errorf(codes.PermissionDenied, "unauthorized to update user in demo mode")
+	}
+
 	currentTs := time.Now().Unix()
 	update := &store.UpdateUser{
 		ID:        user.ID,
@@ -197,6 +201,10 @@ func (s *APIV2Service) DeleteUser(ctx context.Context, request *apiv2pb.DeleteUs
 		return nil, status.Errorf(codes.NotFound, "user not found")
 	}
 
+	if s.Profile.Mode == "demo" && user.Username == "memos-demo" {
+		return nil, status.Errorf(codes.PermissionDenied, "unauthorized to delete this user in demo mode")
+	}
+
 	if err := s.Store.DeleteUser(ctx, &store.DeleteUser{
 		ID: user.ID,
 	}); err != nil {
@@ -211,6 +219,7 @@ func getDefaultUserSetting() *apiv2pb.UserSetting {
 		Locale:         "en",
 		Appearance:     "system",
 		MemoVisibility: "PRIVATE",
+		CompactView:    false,
 	}
 }
 
@@ -236,6 +245,8 @@ func (s *APIV2Service) GetUserSetting(ctx context.Context, _ *apiv2pb.GetUserSet
 			userSettingMessage.MemoVisibility = setting.GetMemoVisibility()
 		} else if setting.Key == storepb.UserSettingKey_USER_SETTING_TELEGRAM_USER_ID {
 			userSettingMessage.TelegramUserId = setting.GetTelegramUserId()
+		} else if setting.Key == storepb.UserSettingKey_USER_SETTING_COMPACT_VIEW {
+			userSettingMessage.CompactView = setting.GetCompactView()
 		}
 	}
 	return &apiv2pb.GetUserSettingResponse{
@@ -290,6 +301,16 @@ func (s *APIV2Service) UpdateUserSetting(ctx context.Context, request *apiv2pb.U
 				Key:    storepb.UserSettingKey_USER_SETTING_TELEGRAM_USER_ID,
 				Value: &storepb.UserSetting_TelegramUserId{
 					TelegramUserId: request.Setting.TelegramUserId,
+				},
+			}); err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to upsert user setting: %v", err)
+			}
+		} else if field == "compact_view" {
+			if _, err := s.Store.UpsertUserSetting(ctx, &storepb.UserSetting{
+				UserId: user.ID,
+				Key:    storepb.UserSettingKey_USER_SETTING_COMPACT_VIEW,
+				Value: &storepb.UserSetting_CompactView{
+					CompactView: request.Setting.CompactView,
 				},
 			}); err != nil {
 				return nil, status.Errorf(codes.Internal, "failed to upsert user setting: %v", err)

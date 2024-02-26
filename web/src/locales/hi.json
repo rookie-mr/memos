@@ -77,10 +77,6 @@
     "visibility": "दृश्यता",
     "yourself": "खुद"
   },
-  "daily-review": {
-    "no-memos": "उफ़, कुछ भी नहीं है।",
-    "title": "दैनिक समीक्षा"
-  },
   "days": {
     "fri": "शुक्रवार",
     "mon": "सोमवार",
@@ -266,7 +262,7 @@
     },
     "system": "सिस्टम"
   },
-  "tag-list": {
+  "tag": {
     "all-tags": "सभी टैग",
     "create-tag": "टैग बनाएँ",
     "tag-name": "टैग_नाम",

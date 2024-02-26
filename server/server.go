@@ -18,7 +18,6 @@ import (
 	"github.com/usememos/memos/server/frontend"
 	"github.com/usememos/memos/server/integration"
 	"github.com/usememos/memos/server/profile"
-	"github.com/usememos/memos/server/service/metric"
 	versionchecker "github.com/usememos/memos/server/service/version_checker"
 	"github.com/usememos/memos/store"
 )
@@ -56,14 +55,10 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 			`"status":${status},"error":"${error}"}` + "\n",
 	}))
 
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		Skipper:      grpcRequestSkipper,
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
-	}))
+	e.Use(CORSMiddleware())
 
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		Skipper: timeoutSkipper,
+		Skipper: grpcRequestSkipper,
 		Timeout: 30 * time.Second,
 	}))
 
@@ -73,9 +68,11 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	}
 	s.ID = serverID
 
-	// Register frontend service.
-	frontendService := frontend.NewFrontendService(profile, store)
-	frontendService.Serve(ctx, e)
+	// Only serve frontend when it's enabled.
+	if profile.Frontend {
+		frontendService := frontend.NewFrontendService(profile, store)
+		frontendService.Serve(ctx, e)
+	}
 
 	secret := "usememos"
 	if profile.Mode == "prod" {
@@ -108,8 +105,6 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 func (s *Server) Start(ctx context.Context) error {
 	go versionchecker.NewVersionChecker(s.Store, s.Profile).Start(ctx)
 	go s.telegramBot.Start(ctx)
-
-	metric.Enqueue("server start")
 	return s.e.Start(fmt.Sprintf("%s:%d", s.Profile.Addr, s.Profile.Port))
 }
 
@@ -135,14 +130,14 @@ func (s *Server) GetEcho() *echo.Echo {
 }
 
 func (s *Server) getSystemServerID(ctx context.Context) (string, error) {
-	serverIDSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+	serverIDSetting, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Name: apiv1.SystemSettingServerIDName.String(),
 	})
 	if err != nil {
 		return "", err
 	}
 	if serverIDSetting == nil || serverIDSetting.Value == "" {
-		serverIDSetting, err = s.Store.UpsertSystemSetting(ctx, &store.SystemSetting{
+		serverIDSetting, err = s.Store.UpsertWorkspaceSetting(ctx, &store.WorkspaceSetting{
 			Name:  apiv1.SystemSettingServerIDName.String(),
 			Value: uuid.NewString(),
 		})
@@ -154,14 +149,14 @@ func (s *Server) getSystemServerID(ctx context.Context) (string, error) {
 }
 
 func (s *Server) getSystemSecretSessionName(ctx context.Context) (string, error) {
-	secretSessionNameValue, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+	secretSessionNameValue, err := s.Store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
 		Name: apiv1.SystemSettingSecretSessionName.String(),
 	})
 	if err != nil {
 		return "", err
 	}
 	if secretSessionNameValue == nil || secretSessionNameValue.Value == "" {
-		secretSessionNameValue, err = s.Store.UpsertSystemSetting(ctx, &store.SystemSetting{
+		secretSessionNameValue, err = s.Store.UpsertWorkspaceSetting(ctx, &store.WorkspaceSetting{
 			Name:  apiv1.SystemSettingSecretSessionName.String(),
 			Value: uuid.NewString(),
 		})
@@ -176,11 +171,27 @@ func grpcRequestSkipper(c echo.Context) bool {
 	return strings.HasPrefix(c.Request().URL.Path, "/memos.api.v2.")
 }
 
-func timeoutSkipper(c echo.Context) bool {
-	if grpcRequestSkipper(c) {
-		return true
-	}
+func CORSMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if grpcRequestSkipper(c) {
+				return next(c)
+			}
 
-	// Skip timeout for blob upload which is frequently timed out.
-	return c.Request().Method == http.MethodPost && c.Request().URL.Path == "/api/v1/resource/blob"
+			r := c.Request()
+			w := c.Response().Writer
+
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+			// If it's preflight request, return immediately.
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return nil
+			}
+			return next(c)
+		}
+	}
 }

@@ -44,6 +44,7 @@ func (s *APIV2Service) CreateResource(ctx context.Context, request *apiv2pb.Crea
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create resource: %v", err)
 	}
+
 	return &apiv2pb.CreateResourceResponse{
 		Resource: s.convertResourceFromStore(ctx, resource),
 	}, nil

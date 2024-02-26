@@ -36,6 +36,7 @@ CREATE TABLE user_setting (
 -- memo
 CREATE TABLE memo (
   id SERIAL PRIMARY KEY,
+  resource_name TEXT NOT NULL UNIQUE,
   creator_id INTEGER NOT NULL,
   created_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
   updated_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
@@ -63,6 +64,7 @@ CREATE TABLE memo_relation (
 -- resource
 CREATE TABLE resource (
   id SERIAL PRIMARY KEY,
+  resource_name TEXT NOT NULL UNIQUE,
   creator_id INTEGER NOT NULL,
   created_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
   updated_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
@@ -128,4 +130,14 @@ CREATE TABLE webhook (
   creator_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   url TEXT NOT NULL
+);
+
+-- reaction
+CREATE TABLE reaction (
+  id SERIAL PRIMARY KEY,
+  created_ts BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW()),
+  creator_id INTEGER NOT NULL,
+  content_id TEXT NOT NULL,
+  reaction_type TEXT NOT NULL,
+  UNIQUE(creator_id, content_id, reaction_type)
 );

@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import Fuse from "fuse.js";
 import { useEffect, useRef, useState } from "react";
 import getCaretCoordinates from "textarea-caret";
 import OverflowTip from "@/components/kit/OverflowTip";
@@ -35,27 +36,9 @@ const TagSuggestions = ({ editorRef, editorActions }: Props) => {
 
   const suggestionsRef = useRef<string[]>([]);
   suggestionsRef.current = (() => {
-    const input = getCurrentWord()[0].slice(1).toLowerCase();
-
-    const customMatches = (tag: string, input: string) => {
-      const tagLowerCase = tag.toLowerCase();
-      const inputLowerCase = input.toLowerCase();
-      let inputIndex = 0;
-
-      for (let i = 0; i < tagLowerCase.length; i++) {
-        if (tagLowerCase[i] === inputLowerCase[inputIndex]) {
-          inputIndex++;
-          if (inputIndex === inputLowerCase.length) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    };
-
-    const matchedTags = tagsRef.current.filter((tag) => customMatches(tag, input));
-    return matchedTags.slice(0, 5);
+    const search = getCurrentWord()[0].slice(1).toLowerCase();
+    const fuse = new Fuse(tagsRef.current);
+    return fuse.search(search).map((result) => result.item);
   })();
 
   const isVisibleRef = useRef(false);
@@ -123,7 +106,7 @@ const TagSuggestions = ({ editorRef, editorActions }: Props) => {
           onMouseDown={() => autocomplete(tag)}
           className={classNames(
             "rounded p-1 px-2 w-full truncate text-sm dark:text-gray-300 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-800",
-            i === selected ? "bg-zinc-300 dark:bg-zinc-700" : ""
+            i === selected ? "bg-zinc-300 dark:bg-zinc-700" : "",
           )}
         >
           <OverflowTip>#{tag}</OverflowTip>

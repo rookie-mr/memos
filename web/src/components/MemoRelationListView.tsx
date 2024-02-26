@@ -8,11 +8,11 @@ import Icon from "./Icon";
 
 interface Props {
   memo: Memo;
-  relationList: MemoRelation[];
+  relations: MemoRelation[];
 }
 
 const MemoRelationListView = (props: Props) => {
-  const { memo, relationList } = props;
+  const { memo, relations: relationList } = props;
   const memoStore = useMemoStore();
   const [referencingMemoList, setReferencingMemoList] = useState<Memo[]>([]);
   const [referencedMemoList, setReferencedMemoList] = useState<Memo[]>([]);
@@ -22,13 +22,13 @@ const MemoRelationListView = (props: Props) => {
       const referencingMemoList = await Promise.all(
         relationList
           .filter((relation) => relation.memoId === memo.id && relation.relatedMemoId !== memo.id)
-          .map((relation) => memoStore.getOrFetchMemoById(relation.relatedMemoId, { skipStore: true }))
+          .map((relation) => memoStore.getOrFetchMemoById(relation.relatedMemoId, { skipStore: true })),
       );
       setReferencingMemoList(referencingMemoList);
       const referencedMemoList = await Promise.all(
         relationList
           .filter((relation) => relation.memoId !== memo.id && relation.relatedMemoId === memo.id)
-          .map((relation) => memoStore.getOrFetchMemoById(relation.memoId, { skipStore: true }))
+          .map((relation) => memoStore.getOrFetchMemoById(relation.memoId, { skipStore: true })),
       );
       setReferencedMemoList(referencedMemoList);
     })();

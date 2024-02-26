@@ -79,10 +79,6 @@
     "visibility": "Visibilità",
     "yourself": "Te stesso"
   },
-  "daily-review": {
-    "no-memos": "Nessun memo oggi.",
-    "title": "Revisione giornaliera"
-  },
   "days": {
     "fri": "Ven",
     "mon": "Lun",
@@ -345,7 +341,7 @@
       "telegram-bot-token-placeholder": "Il token del tuo bot Telegram"
     }
   },
-  "tag-list": {
+  "tag": {
     "all-tags": "Tutti i Tags",
     "create-tag": "Crea Tag",
     "invalid-tag-name": "Nome tag non valido",

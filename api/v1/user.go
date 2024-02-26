@@ -12,7 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/usememos/memos/internal/util"
-	"github.com/usememos/memos/server/service/metric"
 	"github.com/usememos/memos/store"
 )
 
@@ -183,7 +182,6 @@ func (s *APIV1Service) CreateUser(c echo.Context) error {
 	}
 
 	userMessage := convertUserFromStore(user)
-	metric.Enqueue("user create")
 	return c.JSON(http.StatusOK, userMessage)
 }
 
@@ -316,6 +314,14 @@ func (s *APIV1Service) DeleteUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Cannot delete current user")
 	}
 
+	findUser, err := s.Store.GetUser(ctx, &store.FindUser{ID: &userID})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find user").SetInternal(err)
+	}
+	if s.Profile.Mode == "demo" && findUser.Username == "memos-demo" {
+		return echo.NewHTTPError(http.StatusForbidden, "Unauthorized to delete this user in demo mode")
+	}
+
 	if err := s.Store.DeleteUser(ctx, &store.DeleteUser{
 		ID: userID,
 	}); err != nil {
@@ -364,6 +370,10 @@ func (s *APIV1Service) UpdateUser(c echo.Context) error {
 	}
 	if err := request.Validate(); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid update user request").SetInternal(err)
+	}
+
+	if s.Profile.Mode == "demo" && *request.Username == "memos-demo" {
+		return echo.NewHTTPError(http.StatusForbidden, "Unauthorized to update user in demo mode")
 	}
 
 	currentTs := time.Now().Unix()
