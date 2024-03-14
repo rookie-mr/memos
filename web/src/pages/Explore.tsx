@@ -5,7 +5,7 @@ import Icon from "@/components/Icon";
 import MemoFilter from "@/components/MemoFilter";
 import MemoView from "@/components/MemoView";
 import MobileHeader from "@/components/MobileHeader";
-import { DEFAULT_MEMO_LIMIT } from "@/helpers/consts";
+import { DEFAULT_LIST_MEMOS_PAGE_SIZE } from "@/helpers/consts";
 import { getTimeStampByDate } from "@/helpers/datetime";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useFilterWithUrlParams from "@/hooks/useFilterWithUrlParams";
@@ -42,7 +42,7 @@ const Explore = () => {
     }
     setIsRequesting(true);
     const data = await memoStore.fetchMemos({
-      pageSize: DEFAULT_MEMO_LIMIT,
+      pageSize: DEFAULT_LIST_MEMOS_PAGE_SIZE,
       filter: filters.join(" && "),
       pageToken: nextPageTokenRef.current,
     });
@@ -56,7 +56,7 @@ const Explore = () => {
       <div className="relative w-full h-auto flex flex-col justify-start items-start px-4 sm:px-6">
         <MemoFilter className="px-2 pb-2" />
         {sortedMemos.map((memo) => (
-          <MemoView key={`${memo.id}-${memo.displayTime}`} memo={memo} showCreator />
+          <MemoView key={`${memo.id}-${memo.displayTime}`} memo={memo} />
         ))}
         {isRequesting ? (
           <div className="flex flex-row justify-center items-center w-full my-4 text-gray-400">

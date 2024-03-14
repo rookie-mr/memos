@@ -16,10 +16,10 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/usememos/memos/api/auth"
 	"github.com/usememos/memos/internal/util"
 	apiv2pb "github.com/usememos/memos/proto/gen/api/v2"
 	storepb "github.com/usememos/memos/proto/gen/store"
+	"github.com/usememos/memos/server/route/api/auth"
 	"github.com/usememos/memos/store"
 )
 
@@ -151,6 +151,8 @@ func (s *APIV2Service) UpdateUser(ctx context.Context, request *apiv2pb.UpdateUs
 			update.Email = &request.User.Email
 		} else if field == "avatar_url" {
 			update.AvatarURL = &request.User.AvatarUrl
+		} else if field == "description" {
+			update.Description = &request.User.Description
 		} else if field == "role" {
 			role := convertUserRoleToStore(request.User.Role)
 			update.Role = &role
@@ -219,7 +221,6 @@ func getDefaultUserSetting() *apiv2pb.UserSetting {
 		Locale:         "en",
 		Appearance:     "system",
 		MemoVisibility: "PRIVATE",
-		CompactView:    false,
 	}
 }
 
@@ -245,8 +246,6 @@ func (s *APIV2Service) GetUserSetting(ctx context.Context, _ *apiv2pb.GetUserSet
 			userSettingMessage.MemoVisibility = setting.GetMemoVisibility()
 		} else if setting.Key == storepb.UserSettingKey_USER_SETTING_TELEGRAM_USER_ID {
 			userSettingMessage.TelegramUserId = setting.GetTelegramUserId()
-		} else if setting.Key == storepb.UserSettingKey_USER_SETTING_COMPACT_VIEW {
-			userSettingMessage.CompactView = setting.GetCompactView()
 		}
 	}
 	return &apiv2pb.GetUserSettingResponse{
@@ -301,16 +300,6 @@ func (s *APIV2Service) UpdateUserSetting(ctx context.Context, request *apiv2pb.U
 				Key:    storepb.UserSettingKey_USER_SETTING_TELEGRAM_USER_ID,
 				Value: &storepb.UserSetting_TelegramUserId{
 					TelegramUserId: request.Setting.TelegramUserId,
-				},
-			}); err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to upsert user setting: %v", err)
-			}
-		} else if field == "compact_view" {
-			if _, err := s.Store.UpsertUserSetting(ctx, &storepb.UserSetting{
-				UserId: user.ID,
-				Key:    storepb.UserSettingKey_USER_SETTING_COMPACT_VIEW,
-				Value: &storepb.UserSetting_CompactView{
-					CompactView: request.Setting.CompactView,
 				},
 			}); err != nil {
 				return nil, status.Errorf(codes.Internal, "failed to upsert user setting: %v", err)
@@ -512,16 +501,17 @@ func (s *APIV2Service) UpsertAccessTokenToStore(ctx context.Context, user *store
 
 func convertUserFromStore(user *store.User) *apiv2pb.User {
 	return &apiv2pb.User{
-		Name:       fmt.Sprintf("%s%s", UserNamePrefix, user.Username),
-		Id:         user.ID,
-		RowStatus:  convertRowStatusFromStore(user.RowStatus),
-		CreateTime: timestamppb.New(time.Unix(user.CreatedTs, 0)),
-		UpdateTime: timestamppb.New(time.Unix(user.UpdatedTs, 0)),
-		Role:       convertUserRoleFromStore(user.Role),
-		Username:   user.Username,
-		Email:      user.Email,
-		Nickname:   user.Nickname,
-		AvatarUrl:  user.AvatarURL,
+		Name:        fmt.Sprintf("%s%s", UserNamePrefix, user.Username),
+		Id:          user.ID,
+		RowStatus:   convertRowStatusFromStore(user.RowStatus),
+		CreateTime:  timestamppb.New(time.Unix(user.CreatedTs, 0)),
+		UpdateTime:  timestamppb.New(time.Unix(user.UpdatedTs, 0)),
+		Role:        convertUserRoleFromStore(user.Role),
+		Username:    user.Username,
+		Email:       user.Email,
+		Nickname:    user.Nickname,
+		AvatarUrl:   user.AvatarURL,
+		Description: user.Description,
 	}
 }
 

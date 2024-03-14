@@ -1,7 +1,9 @@
-import { Divider, Dropdown, Menu, MenuButton, MenuItem } from "@mui/joy";
-import copy from "copy-to-clipboard";
+import { Dropdown, Menu, MenuButton, MenuItem } from "@mui/joy";
+import classNames from "classnames";
 import toast from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 import Icon from "@/components/Icon";
+import useNavigateTo from "@/hooks/useNavigateTo";
 import { useMemoStore } from "@/store/v1";
 import { RowStatus } from "@/types/proto/api/v2/common";
 import { Memo } from "@/types/proto/api/v2/memo_service";
@@ -12,15 +14,17 @@ import showShareMemoDialog from "./ShareMemoDialog";
 
 interface Props {
   memo: Memo;
+  className?: string;
   hiddenActions?: ("edit" | "archive" | "delete" | "share" | "pin")[];
-  onArchived?: () => void;
-  onDeleted?: () => void;
 }
 
 const MemoActionMenu = (props: Props) => {
   const { memo, hiddenActions } = props;
   const t = useTranslate();
+  const location = useLocation();
+  const navigateTo = useNavigateTo();
   const memoStore = useMemoStore();
+  const isInMemoDetailPage = location.pathname.startsWith(`/m/${memo.name}`);
 
   const handleTogglePinMemoBtnClick = async () => {
     try {
@@ -65,9 +69,12 @@ const MemoActionMenu = (props: Props) => {
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.message);
+      return;
     }
-    if (props.onArchived) {
-      props.onArchived();
+
+    toast.success("Archived successfully");
+    if (isInMemoDetailPage) {
+      navigateTo("/archived");
     }
   };
 
@@ -79,22 +86,18 @@ const MemoActionMenu = (props: Props) => {
       dialogName: "delete-memo-dialog",
       onConfirm: async () => {
         await memoStore.deleteMemo(memo.id);
-        if (props.onDeleted) {
-          props.onDeleted();
+        toast.success("Deleted successfully");
+        if (isInMemoDetailPage) {
+          navigateTo("/");
         }
       },
     });
   };
 
-  const handleCopyMemoId = () => {
-    copy(memo.name);
-    toast.success("Copied to clipboard!");
-  };
-
   return (
     <Dropdown>
       <MenuButton slots={{ root: "div" }}>
-        <span className="h-7 w-7 flex justify-center items-center rounded-full hover:opacity-70">
+        <span className={classNames("flex justify-center items-center rounded-full hover:opacity-70", props.className)}>
           <Icon.MoreVertical className="w-4 h-4 mx-auto text-gray-500 dark:text-gray-400" />
         </span>
       </MenuButton>
@@ -125,12 +128,6 @@ const MemoActionMenu = (props: Props) => {
           <Icon.Trash className="w-4 h-auto" />
           {t("common.delete")}
         </MenuItem>
-        <Divider className="!my-1" />
-        <div className="-mt-0.5 pl-2 pr-2 text-xs text-gray-400">
-          <div className="mt-1 font-mono max-w-20 cursor-pointer truncate" onClick={handleCopyMemoId}>
-            ID: {memo.name}
-          </div>
-        </div>
       </Menu>
     </Dropdown>
   );

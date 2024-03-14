@@ -75,6 +75,13 @@
   
     - [InboxService](#memos-api-v2-InboxService)
   
+- [api/v2/link_service.proto](#api_v2_link_service-proto)
+    - [GetLinkMetadataRequest](#memos-api-v2-GetLinkMetadataRequest)
+    - [GetLinkMetadataResponse](#memos-api-v2-GetLinkMetadataResponse)
+    - [LinkMetadata](#memos-api-v2-LinkMetadata)
+  
+    - [LinkService](#memos-api-v2-LinkService)
+  
 - [api/v2/memo_relation_service.proto](#api_v2_memo_relation_service-proto)
     - [MemoRelation](#memos-api-v2-MemoRelation)
   
@@ -677,6 +684,7 @@ Used internally for obfuscating the page token.
 | email | [string](#string) |  |  |
 | nickname | [string](#string) |  |  |
 | avatar_url | [string](#string) |  |  |
+| description | [string](#string) |  |  |
 | password | [string](#string) |  |  |
 | row_status | [RowStatus](#memos-api-v2-RowStatus) |  |  |
 | create_time | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
@@ -718,7 +726,6 @@ Used internally for obfuscating the page token.
 | appearance | [string](#string) |  | The preferred appearance of the user. |
 | memo_visibility | [string](#string) |  | The default visibility of the memo. |
 | telegram_user_id | [string](#string) |  | The telegram user id of the user. |
-| compact_view | [bool](#bool) |  | The compact view for a memo. |
 
 
 
@@ -1093,6 +1100,79 @@ Used internally for obfuscating the page token.
 | ListInboxes | [ListInboxesRequest](#memos-api-v2-ListInboxesRequest) | [ListInboxesResponse](#memos-api-v2-ListInboxesResponse) | ListInboxes lists inboxes for a user. |
 | UpdateInbox | [UpdateInboxRequest](#memos-api-v2-UpdateInboxRequest) | [UpdateInboxResponse](#memos-api-v2-UpdateInboxResponse) | UpdateInbox updates an inbox. |
 | DeleteInbox | [DeleteInboxRequest](#memos-api-v2-DeleteInboxRequest) | [DeleteInboxResponse](#memos-api-v2-DeleteInboxResponse) | DeleteInbox deletes an inbox. |
+
+ 
+
+
+
+<a name="api_v2_link_service-proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## api/v2/link_service.proto
+
+
+
+<a name="memos-api-v2-GetLinkMetadataRequest"></a>
+
+### GetLinkMetadataRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| link | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-GetLinkMetadataResponse"></a>
+
+### GetLinkMetadataResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| metadata | [LinkMetadata](#memos-api-v2-LinkMetadata) |  |  |
+
+
+
+
+
+
+<a name="memos-api-v2-LinkMetadata"></a>
+
+### LinkMetadata
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| title | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| image | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="memos-api-v2-LinkService"></a>
+
+### LinkService
+
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| GetLinkMetadata | [GetLinkMetadataRequest](#memos-api-v2-GetLinkMetadataRequest) | [GetLinkMetadataResponse](#memos-api-v2-GetLinkMetadataResponse) |  |
 
  
 

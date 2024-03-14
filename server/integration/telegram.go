@@ -3,19 +3,25 @@ package integration
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"time"
 	"unicode/utf16"
 
 	"github.com/lithammer/shortuuid/v4"
 	"github.com/pkg/errors"
+	"github.com/yourselfhosted/gomark/ast"
+	"github.com/yourselfhosted/gomark/parser"
+	"github.com/yourselfhosted/gomark/parser/tokenizer"
 
-	apiv1 "github.com/usememos/memos/api/v1"
 	"github.com/usememos/memos/plugin/telegram"
 	"github.com/usememos/memos/plugin/webhook"
 	storepb "github.com/usememos/memos/proto/gen/store"
+	apiv1 "github.com/usememos/memos/server/route/api/v1"
+	apiv2 "github.com/usememos/memos/server/route/api/v2"
 	"github.com/usememos/memos/store"
 )
 
@@ -47,6 +53,7 @@ func (t *TelegramHandler) MessageHandle(ctx context.Context, bot *telegram.Bot, 
 		return errors.Wrap(err, "Failed to SendReplyMessage")
 	}
 
+	messageSenderID := strconv.FormatInt(message.From.ID, 10)
 	var creatorID int32
 	userSettingList, err := t.store.ListUserSettings(ctx, &store.FindUserSetting{
 		Key: storepb.UserSettingKey_USER_SETTING_TELEGRAM_USER_ID,
@@ -55,11 +62,12 @@ func (t *TelegramHandler) MessageHandle(ctx context.Context, bot *telegram.Bot, 
 		return errors.Wrap(err, "Failed to find userSettingList")
 	}
 	for _, userSetting := range userSettingList {
-		if userSetting.GetTelegramUserId() == strconv.FormatInt(message.From.ID, 10) {
+		if userSetting.GetTelegramUserId() == messageSenderID {
 			creatorID = userSetting.UserId
 		}
 	}
 
+	// If creatorID is not found, ask the user to set the telegram userid in UserSetting of memos.
 	if creatorID == 0 {
 		_, err := bot.EditMessage(ctx, message.Chat.ID, reply.MessageID, fmt.Sprintf("Please set your telegram userid %d in UserSetting of memos", message.From.ID), nil)
 		return err
@@ -70,26 +78,46 @@ func (t *TelegramHandler) MessageHandle(ctx context.Context, bot *telegram.Bot, 
 		CreatorID:    creatorID,
 		Visibility:   store.Private,
 	}
-
 	if message.Text != nil {
 		create.Content = convertToMarkdown(*message.Text, message.Entities)
 	}
-
 	if message.Caption != nil {
 		create.Content = convertToMarkdown(*message.Caption, message.CaptionEntities)
 	}
-
 	if message.ForwardFromChat != nil {
 		create.Content += fmt.Sprintf("\n\n[Message link](%s)", message.GetMessageLink())
 	}
-
 	memoMessage, err := t.store.CreateMemo(ctx, create)
 	if err != nil {
 		_, err := bot.EditMessage(ctx, message.Chat.ID, reply.MessageID, fmt.Sprintf("Failed to CreateMemo: %s", err), nil)
 		return err
 	}
 
-	// create resources
+	// Dynamically upsert tags from memo content.
+	nodes, err := parser.Parse(tokenizer.Tokenize(create.Content))
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse content")
+	}
+	tags := []string{}
+	apiv2.TraverseASTNodes(nodes, func(node ast.Node) {
+		if tagNode, ok := node.(*ast.Tag); ok {
+			tag := tagNode.Content
+			if !slices.Contains(tags, tag) {
+				tags = append(tags, tag)
+			}
+		}
+	})
+	for _, tag := range tags {
+		_, err := t.store.UpsertTag(ctx, &store.Tag{
+			Name:      tag,
+			CreatorID: creatorID,
+		})
+		if err != nil {
+			return errors.Wrap(err, "Failed to upsert tag")
+		}
+	}
+
+	// Create memo related resources.
 	for _, attachment := range attachments {
 		// Fill the common field of create
 		create := store.Resource{
@@ -116,9 +144,7 @@ func (t *TelegramHandler) MessageHandle(ctx context.Context, bot *telegram.Bot, 
 
 	keyboard := generateKeyboardForMemoID(memoMessage.ID)
 	_, err = bot.EditMessage(ctx, message.Chat.ID, reply.MessageID, fmt.Sprintf("Saved as %s Memo %d", memoMessage.Visibility, memoMessage.ID), keyboard)
-
 	_ = t.dispatchMemoRelatedWebhook(ctx, *memoMessage, "memos.memo.created")
-
 	return err
 }
 
@@ -128,6 +154,37 @@ func (t *TelegramHandler) CallbackQueryHandle(ctx context.Context, bot *telegram
 	n, err := fmt.Sscanf(callbackQuery.Data, "%s %d", &visibility, &memoID)
 	if err != nil || n != 2 {
 		return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to parse callbackQuery.Data %s", callbackQuery.Data))
+	}
+
+	memo, err := t.store.GetMemo(ctx, &store.FindMemo{
+		ID: &memoID,
+	})
+	if err != nil {
+		return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to call FindMemo %s", err))
+	}
+	if memo == nil {
+		_, err = bot.EditMessage(ctx, callbackQuery.Message.Chat.ID, callbackQuery.Message.MessageID, fmt.Sprintf("Memo %d not found", memoID), nil)
+		if err != nil {
+			return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to EditMessage %s", err))
+		}
+		return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Memo %d not found, possibly deleted elsewhere", memoID))
+	}
+
+	setting, err := t.store.GetWorkspaceSetting(ctx, &store.FindWorkspaceSetting{
+		Name: apiv1.SystemSettingDisablePublicMemosName.String(),
+	})
+	if err != nil {
+		return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to get workspace setting %s", err))
+	}
+	if setting != nil && setting.Value != "" {
+		disablePublicMemo := false
+		err = json.Unmarshal([]byte(setting.Value), &disablePublicMemo)
+		if err != nil {
+			return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to get workspace setting %s", err))
+		}
+		if disablePublicMemo && visibility == store.Public {
+			return bot.AnswerCallbackQuery(ctx, callbackQuery.ID, fmt.Sprintf("Failed to changing Memo %d to %s\n(workspace disallowed public memo)", memoID, visibility))
+		}
 	}
 
 	update := store.UpdateMemo{
@@ -201,6 +258,9 @@ func convertToMarkdown(text string, messageEntities []telegram.MessageEntity) st
 		case telegram.TextLink:
 			before = "["
 			after = fmt.Sprintf(`](%s)`, e.URL)
+		case telegram.Spoiler:
+			before = "||"
+			after = "||"
 		}
 
 		if before != "" {

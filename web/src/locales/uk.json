@@ -1,190 +1,174 @@
 {
-  "common": {
-    "about": "Про Memos",
-    "email": "Емейл",
-    "password": "Пароль",
-    "username": "Ім'я користувача",
-    "nickname": "Нікнейм",
-    "save": "Зберегти",
-    "close": "Закрити",
-    "cancel": "Скасувати",
-    "create": "Створити",
-    "change": "Змінити",
-    "confirm": "Підтвердити",
-    "reset": "Стерти",
-    "language": "Мова",
-    "version": "Версія",
-    "pin": "Закріпити",
-    "unpin": "Відкріпити",
-    "edit": "Редагувати",
-    "restore": "Відновити",
-    "delete": "Видалити",
-    "null": "Пусто",
-    "share": "Поділитися",
-    "archive": "Архівувати",
-    "basic": "Базові",
-    "admin": "Адміністратор",
-    "explore": "Більше",
-    "sign-in": "Увійти",
-    "sign-up": "Зареєструватися",
-    "sign-out": "Вийти",
-    "type": "Типу",
-    "title": "Заголовок",
-    "filter": "Фільтр",
-    "tags": "Теги",
-    "yourself": "Ви",
-    "changed": "змінено",
-    "fold": "Згорнути",
-    "expand": "Розгорнути",
-    "image": "Світлина",
-    "link": "Посилання",
-    "vacuum": "Стиснути",
-    "select": "Вибрати",
-    "database": "Database",
-    "avatar": "Avatar",
-    "mark": "Mark"
+  "amount-text": {
+    "memo_few": "",
+    "memo_many": "",
+    "memo_one": "НОТАТКА"
   },
   "auth": {
     "host-tip": "Ви реєструєте власника сайту."
   },
-  "resource": {
-    "no-resources": "Немає ресурсів.",
-    "fetching-data": "завантаження даних...",
-    "copy-link": "Копіювати посилання",
-    "delete-resource": "Видалити ресурс",
-    "warning-text": "Ви впевнені що хочете видалити цей ресурс? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗",
-    "linked-amount": "Кількість нотаток",
-    "warning-text-unused": "Ви впенвені що хочете видалити невикористовувані ресурси? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗",
-    "no-unused-resources": "Немає невикористаних ресурсів",
-    "clear": "Clear"
+  "common": {
+    "about": "Про Memos",
+    "admin": "Адміністратор",
+    "archive": "Архівувати",
+    "avatar": "Avatar",
+    "basic": "Базові",
+    "cancel": "Скасувати",
+    "change": "Змінити",
+    "close": "Закрити",
+    "confirm": "Підтвердити",
+    "create": "Створити",
+    "database": "Database",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "email": "Емейл",
+    "explore": "Більше",
+    "filter": "Фільтр",
+    "image": "Світлина",
+    "language": "Мова",
+    "link": "Посилання",
+    "mark": "Mark",
+    "nickname": "Нікнейм",
+    "null": "Пусто",
+    "password": "Пароль",
+    "pin": "Закріпити",
+    "reset": "Стерти",
+    "restore": "Відновити",
+    "save": "Зберегти",
+    "select": "Вибрати",
+    "share": "Поділитися",
+    "sign-in": "Увійти",
+    "sign-out": "Вийти",
+    "sign-up": "Зареєструватися",
+    "tags": "Теги",
+    "title": "Заголовок",
+    "type": "Типу",
+    "unpin": "Відкріпити",
+    "username": "Ім'я користувача",
+    "version": "Версія",
+    "yourself": "Ви"
+  },
+  "days": {
+    "fri": "П'ят.",
+    "mon": "Пон.",
+    "sat": "Суб.",
+    "sun": "Нед.",
+    "thu": "Чет.",
+    "tue": "Вів.",
+    "wed": "Сер."
   },
   "editor": {
-    "editing": "Редагування...",
     "cancel-edit": "Скасувати",
-    "save": "Зберегти",
-    "placeholder": "Ваші думки...",
-    "only-image-supported": "Тільки файли-світлини підтримуються.",
-    "cant-empty": "Текст не може бути порожнім",
+    "editing": "Редагування...",
     "local": "З комп'ютера",
-    "resources": "Завантажені"
+    "placeholder": "Ваші думки...",
+    "save": "Зберегти"
   },
   "memo": {
-    "view-detail": "Деталі",
     "copy-link": "Копіювати посилання",
+    "view-detail": "Деталі",
     "visibility": {
+      "disabled": "Public memos are disabled",
       "private": "Видимий тільки вам",
       "protected": "Видимий тільки користувачам",
-      "public": "Видимий усім",
-      "disabled": "Public memos are disabled"
+      "public": "Видимий усім"
+    }
+  },
+  "message": {
+    "change-memo-created-time": "Змінити час створення нотатки",
+    "change-resource-filename": "Змінити назву файла",
+    "click-to-save-the-image": "Натисніть щоб зберегти світлину",
+    "copied": "Скопійовано",
+    "count-selected-resources": "Всього вибрано",
+    "fill-all": "Будь ласка заповність усі поля.",
+    "fill-form": "Будь ласка заповніть форму",
+    "generating-the-screenshot": "Створюємо знімок...",
+    "image-load-failed": "Помилка завантаження зображення",
+    "invalid-created-datetime": "Невірний час створення.",
+    "invalid-resource-filename": "Невірна назва файла.",
+    "login-failed": "Помилка входу",
+    "memo-not-found": "Нотатку не знайдено.",
+    "memo-updated-datetime": "Час створення змінено.",
+    "memos-ready": "більше нотаток немає 🎉",
+    "new-password-not-match": "Нові паролі не співпадають.",
+    "password-changed": "Пароль змінено",
+    "password-not-match": "Паролі не співпадають.",
+    "private-only": "Ця нотатка приватна.",
+    "resource-filename-updated": "Назву файла змінено.",
+    "restored-successfully": "Відновлення успішне.",
+    "signup-failed": "Помилка реєстрації",
+    "succeed-copy-code": "Succeed to copy code to clipboard.",
+    "succeed-copy-content": "Скопійовано текст в буфер обміну.",
+    "succeed-copy-link": "Скопійовано посилання в буфер обміну.",
+    "succeed-copy-resource-link": "Посилання на ресурс скопійовано в буфер обміну",
+    "succeed-update-additional-script": "Успішно додано скрипти",
+    "succeed-update-additional-style": "Успішно додано стилі",
+    "succeed-update-customized-profile": "Успішно збережено власний профіль",
+    "succeed-vacuum-database": "БД стиснуто",
+    "update-succeed": "Збережно",
+    "user-not-found": "Користувача не знайдено"
+  },
+  "resource": {
+    "clear": "Clear",
+    "copy-link": "Копіювати посилання",
+    "delete-resource": "Видалити ресурс",
+    "fetching-data": "завантаження даних...",
+    "linked-amount": "Кількість нотаток",
+    "no-resources": "Немає ресурсів.",
+    "no-unused-resources": "Немає невикористаних ресурсів",
+    "warning-text": "Ви впевнені що хочете видалити цей ресурс? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗",
+    "warning-text-unused": "Ви впенвені що хочете видалити невикористовувані ресурси? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗"
+  },
+  "setting": {
+    "account-section": {
+      "change-password": "Змінити пароль",
+      "title": "Інформація про акаунт",
+      "update-information": "Оновити інформацію"
+    },
+    "appearance-option": {
+      "dark": "Завжди темна",
+      "light": "Завжди світла",
+      "system": "Автоматично"
+    },
+    "member": "Користувачі",
+    "member-list": "Список користувачів",
+    "member-section": {
+      "create-a-member": "Створити користувача"
+    },
+    "my-account": "Мій аккаунт",
+    "preference": "Налаштування",
+    "preference-section": {
+      "default-memo-sort-option": "Час відображення закладки",
+      "default-memo-visibility": "Стандартна видимість нотаток",
+      "theme": "Тема"
+    },
+    "sso": "SSO",
+    "storage": "Storage",
+    "storage-section": {
+      "create-a-service": "Create a service",
+      "delete-storage": "Delete Storage",
+      "storage-services": "Storage service",
+      "update-a-service": "Update a service",
+      "warning-text": "Are you sure to delete this storage service? THIS ACTION IS IRREVERSIBLE❗"
+    },
+    "system": "Системні",
+    "system-section": {
+      "additional-script": "Кастомні скрипти",
+      "additional-script-placeholder": "Додатковий JavaScript",
+      "additional-style": "Кастомні стилі",
+      "additional-style-placeholder": "Додатковий CSS",
+      "allow-user-signup": "Дозволити реєстрацію користувачів",
+      "customize-server": {
+        "icon-url": "URL іконки",
+        "title": "Налаштувати додаток"
+      },
+      "database-file-size": "Розмір файлу бази даних",
+      "disable-public-memos": "Disable public memos",
+      "display-with-updated-time": "Display with updated time",
+      "server-name": "Назва додатка"
     }
   },
   "tag": {
     "tip-text": "Введіть `#tag` щоб створити"
-  },
-  "setting": {
-    "my-account": "Мій аккаунт",
-    "preference": "Налаштування",
-    "member": "Користувачі",
-    "member-list": "Список користувачів",
-    "system": "Системні",
-    "account-section": {
-      "title": "Інформація про акаунт",
-      "update-information": "Оновити інформацію",
-      "change-password": "Змінити пароль"
-    },
-    "preference-section": {
-      "theme": "Тема",
-      "default-memo-visibility": "Стандартна видимість нотаток",
-      "enable-folding-memo": "Згортати нотатки",
-      "editor-font-style": "Стиль шрифта",
-      "mobile-editor-style": "Стиль мобільного редактора",
-      "default-memo-sort-option": "Час відображення закладки",
-      "created_ts": "Час створення",
-      "updated_ts": "Час оновлення",
-      "enable-double-click": "Enable double-click to edit",
-      "auto-collapse": "Автоматичне згортання"
-    },
-    "member-section": {
-      "create-a-member": "Створити користувача"
-    },
-    "system-section": {
-      "server-name": "Назва додатка",
-      "customize-server": {
-        "title": "Налаштувати додаток",
-        "default": "За замовчуванням: memos",
-        "icon-url": "URL іконки"
-      },
-      "database-file-size": "Розмір файлу бази даних",
-      "allow-user-signup": "Дозволити реєстрацію користувачів",
-      "additional-style": "Кастомні стилі",
-      "additional-script": "Кастомні скрипти",
-      "additional-style-placeholder": "Додатковий CSS",
-      "additional-script-placeholder": "Додатковий JavaScript",
-      "disable-public-memos": "Disable public memos",
-      "display-with-updated-time": "Display with updated time"
-    },
-    "appearance-option": {
-      "system": "Автоматично",
-      "light": "Завжди світла",
-      "dark": "Завжди темна"
-    },
-    "storage": "Storage",
-    "storage-section": {
-      "update-a-service": "Update a service",
-      "warning-text": "Are you sure to delete this storage service? THIS ACTION IS IRREVERSIBLE❗",
-      "delete-storage": "Delete Storage",
-      "storage-services": "Storage service",
-      "create-a-service": "Create a service"
-    },
-    "sso": "SSO"
-  },
-  "amount-text": {
-    "memo_one": "НОТАТКА",
-    "memo_few": "",
-    "memo_many": ""
-  },
-  "message": {
-    "memos-ready": "більше нотаток немає 🎉",
-    "restored-successfully": "Відновлення успішне.",
-    "memo-updated-datetime": "Час створення змінено.",
-    "invalid-created-datetime": "Невірний час створення.",
-    "change-memo-created-time": "Змінити час створення нотатки",
-    "memo-not-found": "Нотатку не знайдено.",
-    "fill-all": "Будь ласка заповність усі поля.",
-    "password-not-match": "Паролі не співпадають.",
-    "new-password-not-match": "Нові паролі не співпадають.",
-    "image-load-failed": "Помилка завантаження зображення",
-    "fill-form": "Будь ласка заповніть форму",
-    "login-failed": "Помилка входу",
-    "signup-failed": "Помилка реєстрації",
-    "user-not-found": "Користувача не знайдено",
-    "password-changed": "Пароль змінено",
-    "private-only": "Ця нотатка приватна.",
-    "copied": "Скопійовано",
-    "succeed-copy-content": "Скопійовано текст в буфер обміну.",
-    "succeed-copy-link": "Скопійовано посилання в буфер обміну.",
-    "change-resource-filename": "Змінити назву файла",
-    "resource-filename-updated": "Назву файла змінено.",
-    "invalid-resource-filename": "Невірна назва файла.",
-    "click-to-save-the-image": "Натисніть щоб зберегти світлину",
-    "generating-the-screenshot": "Створюємо знімок...",
-    "count-selected-resources": "Всього вибрано",
-    "succeed-vacuum-database": "БД стиснуто",
-    "succeed-update-additional-style": "Успішно додано стилі",
-    "succeed-copy-resource-link": "Посилання на ресурс скопійовано в буфер обміну",
-    "succeed-update-customized-profile": "Успішно збережено власний профіль",
-    "succeed-update-additional-script": "Успішно додано скрипти",
-    "update-succeed": "Збережно",
-    "succeed-copy-code": "Succeed to copy code to clipboard.",
-    "page-not-found": "404 - Page Not Found 😥"
-  },
-  "days": {
-    "mon": "Пон.",
-    "tue": "Вів.",
-    "wed": "Сер.",
-    "thu": "Чет.",
-    "fri": "П'ят.",
-    "sat": "Суб.",
-    "sun": "Нед."
   }
 }

@@ -7,6 +7,7 @@ tags:
   - name: UserService
   - name: AuthService
   - name: InboxService
+  - name: LinkService
   - name: ResourceService
   - name: MemoService
   - name: TagService
@@ -649,6 +650,25 @@ paths:
           type: string
       tags:
         - MemoService
+  /api/v2/metadata:
+    get:
+      operationId: LinkService_GetLinkMetadata
+      responses:
+        "200":
+          description: A successful response.
+          schema:
+            $ref: '#/definitions/v2GetLinkMetadataResponse'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/googlerpcStatus'
+      parameters:
+        - name: link
+          in: query
+          required: false
+          type: string
+      tags:
+        - LinkService
   /api/v2/resources:
     get:
       summary: ListResources lists all resources.
@@ -1437,9 +1457,6 @@ paths:
               telegramUserId:
                 type: string
                 description: The telegram user id of the user.
-              compactView:
-                type: boolean
-                description: The compact view for a memo.
       tags:
         - UserService
   /api/v2/{user.name}:
@@ -1482,6 +1499,8 @@ paths:
               nickname:
                 type: string
               avatarUrl:
+                type: string
+              description:
                 type: string
               password:
                 type: string
@@ -1626,9 +1645,6 @@ definitions:
       telegramUserId:
         type: string
         description: The telegram user id of the user.
-      compactView:
-        type: boolean
-        description: The compact view for a memo.
   apiv2Webhook:
     type: object
     properties:
@@ -1794,6 +1810,11 @@ definitions:
     properties:
       user:
         $ref: '#/definitions/v2User'
+  v2GetLinkMetadataResponse:
+    type: object
+    properties:
+      metadata:
+        $ref: '#/definitions/v2LinkMetadata'
   v2GetMemoByNameResponse:
     type: object
     properties:
@@ -1895,6 +1916,15 @@ definitions:
       - TYPE_MEMO_COMMENT
       - TYPE_VERSION_UPDATE
     default: TYPE_UNSPECIFIED
+  v2LinkMetadata:
+    type: object
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      image:
+        type: string
   v2ListInboxesResponse:
     type: object
     properties:
@@ -2194,6 +2224,8 @@ definitions:
       nickname:
         type: string
       avatarUrl:
+        type: string
+      description:
         type: string
       password:
         type: string

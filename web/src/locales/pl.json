@@ -20,7 +20,6 @@
     "beta": "Beta",
     "cancel": "Anuluj",
     "change": "Zmień",
-    "changed": "zmodyfikowano",
     "clear": "Wyczyść",
     "close": "Zamknij",
     "confirm": "Potwierdź",
@@ -29,11 +28,8 @@
     "delete": "Usuń",
     "edit": "Edytuj",
     "email": "Email",
-    "expand": "Rozwiń",
     "explore": "Odkrywaj",
     "filter": "Filtruj",
-    "filter-period": "{{from}} do {{to}}",
-    "fold": "Zwiń",
     "image": "Obrazek",
     "inbox": "Skrzynka odbiorcza",
     "language": "Język",
@@ -67,7 +63,6 @@
     "unpin": "Odepnij",
     "update": "Zaktualizuj",
     "username": "Nazwa użytkownika",
-    "vacuum": "Vacuum",
     "version": "Wersja",
     "visibility": "Widoczność",
     "yourself": "Ty"
@@ -83,12 +78,9 @@
   },
   "editor": {
     "cancel-edit": "Anuluj edycję",
-    "cant-empty": "Treść nie może być pusta",
     "editing": "Edytowanie...",
     "local": "Lokalne",
-    "only-image-supported": "Obsługiwane są tylko obrazy.",
     "placeholder": "Jakieś przemyślenia...",
-    "resources": "Zasoby",
     "save": "Zapisz"
   },
   "memo": {
@@ -124,7 +116,6 @@
     "memo-updated-datetime": "Zmieniono datę utworzenia notatki.",
     "memos-ready": "wszystkie notatki są gotowe 🎉",
     "new-password-not-match": "Nowe hasła się nie zgadzają.",
-    "page-not-found": "404 - Nie znaleziono 😥",
     "password-changed": "Zmieniono hasło",
     "password-not-match": "Hasła się nie zgadzają.",
     "private-only": "Ta notatka jest prywatna.",
@@ -189,16 +180,9 @@
     "my-account": "Moje konto",
     "preference": "Ustawienia",
     "preference-section": {
-      "auto-collapse": "Automatyczne zwijanie",
-      "created_ts": "Data utworzenia",
       "default-memo-sort-option": "Wyświetlana data notatki",
       "default-memo-visibility": "Domyślna widoczność notatki",
-      "editor-font-style": "Styl czcionki w edytorze",
-      "enable-double-click": "Włącz podwójne kliknięcie aby edytować",
-      "enable-folding-memo": "Włącz zawijanie notatek",
-      "mobile-editor-style": "Styl edytora mobilnego",
-      "theme": "Motyw",
-      "updated_ts": "Data aktualizacji"
+      "theme": "Motyw"
     },
     "sso": "SSO",
     "storage": "Przechowywanie",
@@ -217,7 +201,6 @@
       "additional-style-placeholder": "Dodatkowy kod CSS",
       "allow-user-signup": "Zezwól na rejestrację",
       "customize-server": {
-        "default": "Domyślnie to memos",
         "icon-url": "URL ikony",
         "title": "Personalizuj serwer"
       },

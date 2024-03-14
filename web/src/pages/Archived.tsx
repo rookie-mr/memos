@@ -9,9 +9,8 @@ import MemoContent from "@/components/MemoContent";
 import MemoFilter from "@/components/MemoFilter";
 import MobileHeader from "@/components/MobileHeader";
 import SearchBar from "@/components/SearchBar";
-import { DEFAULT_MEMO_LIMIT } from "@/helpers/consts";
+import { DEFAULT_LIST_MEMOS_PAGE_SIZE } from "@/helpers/consts";
 import { getTimeStampByDate } from "@/helpers/datetime";
-import { getDateTimeString } from "@/helpers/datetime";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useFilterWithUrlParams from "@/hooks/useFilterWithUrlParams";
 import { useMemoList, useMemoStore } from "@/store/v1";
@@ -51,7 +50,7 @@ const Archived = () => {
     }
     setIsRequesting(true);
     const data = await memoStore.fetchMemos({
-      pageSize: DEFAULT_MEMO_LIMIT,
+      pageSize: DEFAULT_LIST_MEMOS_PAGE_SIZE,
       filter: filters.join(" && "),
       pageToken: nextPageTokenRef.current,
     });
@@ -105,7 +104,9 @@ const Archived = () => {
             >
               <div className="w-full mb-1 flex flex-row justify-between items-center">
                 <div className="w-full max-w-[calc(100%-20px)] flex flex-row justify-start items-center mr-1">
-                  <span className="text-sm text-gray-400 select-none">{getDateTimeString(memo.displayTime)}</span>
+                  <div className="text-sm leading-6 text-gray-400 select-none">
+                    <relative-time datetime={memo.displayTime?.toISOString()} tense="past"></relative-time>
+                  </div>
                 </div>
                 <div className="flex flex-row justify-end items-center gap-x-2">
                   <Tooltip title={t("common.restore")} placement="top">

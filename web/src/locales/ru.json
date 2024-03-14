@@ -3,8 +3,7 @@
     "about-memos": "О Memos",
     "memos-description": "Memos - это веб-приложение для создания заметок, которое вы можете использовать для написания, упорядочивания заметок и обмена ими.",
     "no-server-description": "Описание для этого сервера не настроено.",
-    "other-projects": "Другие проекты",
-    "powered-by": "Создано"
+    "other-projects": "Другие проекты"
   },
   "amount-text": {
     "memo_few": "",
@@ -26,7 +25,6 @@
     "beta": "Beta",
     "cancel": "Отменить",
     "change": "Заменить",
-    "changed": "изменено",
     "clear": "Очистить",
     "close": "Закрыть",
     "confirm": "Подтвердить",
@@ -35,11 +33,8 @@
     "delete": "Удалить",
     "edit": "Редактировать",
     "email": "Email",
-    "expand": "Развернуть",
     "explore": "Обзор",
     "filter": "Фильтр",
-    "filter-period": "{{from}} по {{to}}",
-    "fold": "Свернуть",
     "home": "Главная",
     "image": "Изображение",
     "language": "Язык",
@@ -73,7 +68,6 @@
     "update": "Изменить",
     "upload": "Загрузить",
     "username": "Имя",
-    "vacuum": "Сжать",
     "version": "Версия",
     "visibility": "Видимость",
     "yourself": "Вы"
@@ -89,12 +83,9 @@
   },
   "editor": {
     "cancel-edit": "Отменить",
-    "cant-empty": "Содержимое не может быть пустым",
     "editing": "Редактирование...",
     "local": "На устройстве",
-    "only-image-supported": "Поддерживаются только изображения.",
     "placeholder": "Ваши мысли...",
-    "resources": "Ресурсы",
     "save": "Сохранить"
   },
   "embed-memo": {
@@ -102,14 +93,6 @@
     "only-public-supported": "* Поддерживаются только публичные записи",
     "text": "Скопируйте и вставьте код в Ваш блог или сайт",
     "title": "Встраивание записи"
-  },
-  "heatmap": {
-    "day": "день",
-    "days": "дней",
-    "memo-in": "запись за {{period}}",
-    "memo-on": "{{amount}} запись за {{date}}",
-    "memos-in": "записей за {{period}}",
-    "memos-on": "{{amount}} записей за {{date}}"
   },
   "memo": {
     "archived-at": "Архив",
@@ -136,7 +119,6 @@
     "click-to-save-the-image": "Нажмите для сохранения изображения",
     "copied": "Скопировано",
     "count-selected-resources": "Всего выбрано",
-    "file-exceeds-upload-limit-of": "Файл {{file}} превышает лимит на загрузку {{size}} МБ",
     "fill-all": "Пожалуйста, заполните все поля.",
     "fill-form": "Пожалуйста, заполните форму",
     "fill-server-name": "Пожалуйста, введите имя сервера",
@@ -151,7 +133,6 @@
     "memos-ready": "больше записей нет 🎉",
     "new-password-not-match": "Новый пароль не совпадает.",
     "no-data": "Данные не были найдены.",
-    "page-not-found": "404 - Страница не найдена 😥",
     "password-changed": "Пароль изменён",
     "password-not-match": "Пароли не совпадают.",
     "private-only": "Это частная заметка.",
@@ -236,20 +217,11 @@
     "my-account": "Мой аккаунт",
     "preference": "Настройки",
     "preference-section": {
-      "auto-collapse": "Автоматическое свертывание",
-      "created_ts": "Время создания",
-      "daily-review-time-offset": "Смещение времени ежедневного просмотра",
       "default-memo-sort-option": "Отображаемое время записи",
       "default-memo-visibility": "Видимость записей по умолчанию",
-      "default-resource-visibility": "Видимость ресурсов по умолчанию",
-      "editor-font-style": "Стиль шрифта",
-      "enable-double-click": "Разрешить двойной клик для редактирования",
-      "enable-folding-memo": "Включить сворачивание записей",
-      "mobile-editor-style": "Стиль мобильного редактора",
       "telegram-user-id": "ID пользователя Telegram",
       "telegram-user-id-placeholder": "Отправьте любое сообщение своему Telegram-боту, чтобы узнать ID",
-      "theme": "Тема",
-      "updated_ts": "Время обновления"
+      "theme": "Тема"
     },
     "sso": "SSO",
     "sso-section": {
@@ -288,6 +260,7 @@
       "path": "Путь к хранилищу",
       "path-description": "Вы можете использовать переменные от локального хранилища, например {filename}",
       "path-placeholder": "пользовательский/путь",
+      "presign-placeholder": "Генерировать временную публичную ссылку, необязательно",
       "region": "Регион",
       "region-placeholder": "Название региона",
       "s3-compatible-url": "S3 совместимый URL",
@@ -302,7 +275,6 @@
       "update-storage": "Обновить хранилище",
       "url-prefix": "Префикс URL",
       "url-prefix-placeholder": "Пользовательский префикс URL, необязательно",
-      "presign-placeholder": "Генерировать временную публичную ссылку, необязательно",
       "url-suffix": "суффикс URL",
       "url-suffix-placeholder": "Пользовательский суффикс URL, необязательно",
       "warning-text": "Вы уверены, что хотите удалить это хранилище?\nЭТО ДЕЙСТВИЕ НЕВОЗМОЖНО ОТМЕНИТЬ❗"
@@ -316,7 +288,6 @@
       "allow-user-signup": "Разрешить регистрацию пользователей",
       "customize-server": {
         "appearance": "Тема",
-        "default": "По умолчанию: memos",
         "description": "Описание",
         "icon-url": "URL иконки",
         "locale": "Язык",

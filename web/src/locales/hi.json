@@ -3,8 +3,7 @@
     "about-memos": "मेमोस के बारे में",
     "memos-description": "मेमोस एक वेब-आधारित नोट-लेखन एप्लिकेशन है जिसका उपयोग आप नोट लिखने, व्यवस्थित करने और साझा करने के लिए कर सकते हैं।",
     "no-server-description": "इस सर्वर के लिए कोई विवरण निर्धारित नहीं किया गया है।",
-    "other-projects": "अन्य प्रोजेक्ट्स",
-    "powered-by": "द्वारा संचालित"
+    "other-projects": "अन्य प्रोजेक्ट्स"
   },
   "amount-text": {
     "memo_one": "मेमो",
@@ -25,7 +24,6 @@
     "beta": "बीटा",
     "cancel": "रद्द करें",
     "change": "बदलें",
-    "changed": "बदल गया",
     "clear": "साफ़ करें",
     "close": "बंद करें",
     "confirm": "पुष्टि करें",
@@ -34,11 +32,8 @@
     "delete": "हटाएँ",
     "edit": "संपादित करें",
     "email": "ईमेल",
-    "expand": "विस्तार करें",
     "explore": "अन्वेषण करें",
     "filter": "फ़िल्टर",
-    "filter-period": "{{from}} से {{to}} तक",
-    "fold": "फोल्ड",
     "home": "होम",
     "image": "तस्वीर",
     "language": "भाषा",
@@ -72,7 +67,6 @@
     "update": "अपडेट करें",
     "upload": "अपलोड करें",
     "username": "उपयोगकर्ता नाम",
-    "vacuum": "वैक्यूम",
     "version": "संस्करण",
     "visibility": "दृश्यता",
     "yourself": "खुद"
@@ -88,12 +82,9 @@
   },
   "editor": {
     "cancel-edit": "संपादन रद्द करें",
-    "cant-empty": "सामग्री खाली नहीं हो सकती",
     "editing": "संपादन कर रहे हैं...",
     "local": "स्थानीय",
-    "only-image-supported": "केवल छवि फ़ाइल समर्थित है।",
     "placeholder": "कोई विचार...",
-    "resources": "संसाधन",
     "save": "सहेजें"
   },
   "embed-memo": {
@@ -101,14 +92,6 @@
     "only-public-supported": "* केवल सार्वजनिक मेमो एम्बेड किए जा सकते हैं।",
     "text": "नीचे दिए गए कोड को अपने ब्लॉग या वेबसाइट में कॉपी और पेस्ट करें।",
     "title": "मेमो एम्बेड करें"
-  },
-  "heatmap": {
-    "day": "दिन",
-    "days": "दिनें",
-    "memo-in": "{{period}} में मेमो",
-    "memo-on": "{{date}} को {{amount}} मेमो",
-    "memos-in": "{{period}} में मेमोस",
-    "memos-on": "{{date}} को {{amount}} मेमोस"
   },
   "memo": {
     "archived-at": "संग्रहीत किया गया",
@@ -135,7 +118,6 @@
     "click-to-save-the-image": "तस्वीर सहेजने के लिए क्लिक करें",
     "copied": "कॉपी किया गया",
     "count-selected-resources": "कुल चयनित",
-    "file-exceeds-upload-limit-of": "फ़ाइल {{file}} अपलोड सीमा {{size}} MiB की पार कर गई है",
     "fill-all": "कृपया सभी फ़ील्ड भरें।",
     "fill-form": "कृपया इस फ़ॉर्म को भरें",
     "fill-server-name": "कृपया सर्वर का नाम भरें",
@@ -150,7 +132,6 @@
     "memos-ready": "सभी मेमो तैयार हैं 🎉",
     "new-password-not-match": "नए पासवर्ड मेल नहीं खाते।",
     "no-data": "शायद कोई डेटा नहीं मिला, शायद यह किसी अन्य विकल्प हो सकता है।",
-    "page-not-found": "404 - पेज नहीं मिला 😥",
     "password-changed": "पासवर्ड बदल दिया गया",
     "password-not-match": "पासवर्ड मेल नहीं खाते।",
     "private-only": "यह मेमो केवल निजी है।",
@@ -226,20 +207,11 @@
     "my-account": "मेरा खाता",
     "preference": "प्राथमिकता",
     "preference-section": {
-      "auto-collapse": "ऑटो संक्षेपित",
-      "created_ts": "समय बनाया गया",
-      "daily-review-time-offset": "दैनिक समीक्षा समय ऑफ़सेट",
       "default-memo-sort-option": "मेमो प्रदर्शन समय",
       "default-memo-visibility": "डिफ़ॉल्ट मेमो दृश्यता",
-      "default-resource-visibility": "डिफ़ॉल्ट संसाधन दृश्यता",
-      "editor-font-style": "संपादक फ़ॉन्ट शैली",
-      "enable-double-click": "दोहरी क्लिक संपादित करने की सक्षमता",
-      "enable-folding-memo": "मेमो फोल्ड करने की सक्षमता",
-      "mobile-editor-style": "मोबाइल संपादक शैली",
       "telegram-user-id": "टेलीग्राम उपयोगकर्ता आईडी",
       "telegram-user-id-placeholder": "अपने टेलीग्राम बॉट को कोई शब्द भेजें और प्राप्त करें",
-      "theme": "थीम",
-      "updated_ts": "समय अद्यतन किया गया"
+      "theme": "थीम"
     },
     "sso": "एसएसओ",
     "storage": "संग्रहण",
