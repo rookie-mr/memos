@@ -4,13 +4,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/usememos/memos/plugin/gomark/ast"
 	"github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+	"github.com/usememos/memos/plugin/gomark/restore"
 )
 
 func TestCodeParser(t *testing.T) {
 	tests := []struct {
 		text string
-		code *CodeParser
+		code ast.Node
 	}{
 		{
 			text: "`Hello world!",
@@ -18,7 +21,7 @@ func TestCodeParser(t *testing.T) {
 		},
 		{
 			text: "`Hello world!`",
-			code: &CodeParser{
+			code: &ast.Code{
 				Content: "Hello world!",
 			},
 		},
@@ -30,7 +33,7 @@ func TestCodeParser(t *testing.T) {
 
 	for _, test := range tests {
 		tokens := tokenizer.Tokenize(test.text)
-		code := NewCodeParser()
-		require.Equal(t, test.code, code.Match(tokens))
+		node, _ := NewCodeParser().Match(tokens)
+		require.Equal(t, restore.Restore([]ast.Node{test.code}), restore.Restore([]ast.Node{node}))
 	}
 }

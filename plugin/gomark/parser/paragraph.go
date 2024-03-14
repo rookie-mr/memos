@@ -1,6 +1,9 @@
 package parser
 
-import "github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+import (
+	"github.com/usememos/memos/plugin/gomark/ast"
+	"github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+)
 
 type ParagraphParser struct {
 	ContentTokens []*tokenizer.Token
@@ -10,21 +13,17 @@ func NewParagraphParser() *ParagraphParser {
 	return &ParagraphParser{}
 }
 
-func (*ParagraphParser) Match(tokens []*tokenizer.Token) *ParagraphParser {
-	contentTokens := []*tokenizer.Token{}
-	cursor := 0
-	for ; cursor < len(tokens); cursor++ {
-		token := tokens[cursor]
-		if token.Type == tokenizer.Newline {
-			break
-		}
-		contentTokens = append(contentTokens, token)
-	}
-	if len(contentTokens) == 0 {
-		return nil
+func (*ParagraphParser) Match(tokens []*tokenizer.Token) (ast.Node, int) {
+	matchedTokens := tokenizer.GetFirstLine(tokens)
+	if len(matchedTokens) == 0 {
+		return nil, 0
 	}
 
-	return &ParagraphParser{
-		ContentTokens: contentTokens,
+	children, err := ParseInline(matchedTokens)
+	if err != nil {
+		return nil, 0
 	}
+	return &ast.Paragraph{
+		Children: children,
+	}, len(matchedTokens)
 }

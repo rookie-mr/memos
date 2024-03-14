@@ -1,38 +1,30 @@
 package parser
 
-import "github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+import (
+	"github.com/usememos/memos/plugin/gomark/ast"
+	"github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+)
 
-type CodeParser struct {
-	Content string
-}
+type CodeParser struct{}
 
 func NewCodeParser() *CodeParser {
 	return &CodeParser{}
 }
 
-func (*CodeParser) Match(tokens []*tokenizer.Token) *CodeParser {
-	if len(tokens) < 3 {
-		return nil
+func (*CodeParser) Match(tokens []*tokenizer.Token) (ast.Node, int) {
+	matchedTokens := tokenizer.GetFirstLine(tokens)
+	if len(matchedTokens) < 3 {
+		return nil, 0
 	}
-	if tokens[0].Type != tokenizer.Backtick {
-		return nil
+	if matchedTokens[0].Type != tokenizer.Backtick {
+		return nil, 0
 	}
-
-	content, matched := "", false
-	for _, token := range tokens[1:] {
-		if token.Type == tokenizer.Newline {
-			return nil
-		}
-		if token.Type == tokenizer.Backtick {
-			matched = true
-			break
-		}
-		content += token.Value
+	nextBacktickIndex := tokenizer.FindUnescaped(matchedTokens[1:], tokenizer.Backtick)
+	if nextBacktickIndex < 0 {
+		return nil, 0
 	}
-	if !matched || len(content) == 0 {
-		return nil
-	}
-	return &CodeParser{
-		Content: content,
-	}
+	matchedTokens = matchedTokens[:1+nextBacktickIndex+1]
+	return &ast.Code{
+		Content: tokenizer.Stringify(matchedTokens[1 : len(matchedTokens)-1]),
+	}, len(matchedTokens)
 }

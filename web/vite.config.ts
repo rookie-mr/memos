@@ -1,4 +1,4 @@
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { defineConfig } from "vite";
 
@@ -17,19 +17,23 @@ export default defineConfig({
     proxy: {
       "^/api": {
         target: devProxyServer,
-        changeOrigin: true,
+        xfwd: true,
+      },
+      "^/memos.api.v2": {
+        target: devProxyServer,
+        xfwd: true,
       },
       "^/o/": {
         target: devProxyServer,
-        changeOrigin: true,
+        xfwd: true,
       },
       "^/u/.+/rss.xml": {
         target: devProxyServer,
-        changeOrigin: true,
+        xfwd: true,
       },
-      "/explore/rss.xml": {
+      "^/explore/rss.xml": {
         target: devProxyServer,
-        changeOrigin: true,
+        xfwd: true,
       },
     },
   },

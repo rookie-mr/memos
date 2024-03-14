@@ -1,23 +1,30 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/usememos/memos/common/util"
+	"golang.org/x/crypto/bcrypt"
+
+	"github.com/usememos/memos/api/auth"
+	"github.com/usememos/memos/internal/util"
 	"github.com/usememos/memos/plugin/idp"
 	"github.com/usememos/memos/plugin/idp/oauth2"
+	storepb "github.com/usememos/memos/proto/gen/store"
 	"github.com/usememos/memos/store"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type SignIn struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Remember bool   `json:"remember"`
 }
 
 type SSOSignIn struct {
@@ -94,12 +101,22 @@ func (s *APIV1Service) SignIn(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Incorrect login credentials, please try again")
 	}
 
-	if err := GenerateTokensAndSetCookies(c, user, s.Secret); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate tokens").SetInternal(err)
+	var expireAt time.Time
+	// Set cookie expiration to 100 years to make it persistent.
+	cookieExp := time.Now().AddDate(100, 0, 0)
+	if !signin.Remember {
+		expireAt = time.Now().Add(auth.AccessTokenDuration)
+		cookieExp = time.Now().Add(auth.CookieExpDuration)
 	}
-	if err := s.createAuthSignInActivity(c, user); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create activity").SetInternal(err)
+
+	accessToken, err := auth.GenerateAccessToken(user.Username, user.ID, expireAt, []byte(s.Secret))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to generate tokens, err: %s", err)).SetInternal(err)
 	}
+	if err := s.UpsertAccessTokenToStore(ctx, user, accessToken); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to upsert access token, err: %s", err)).SetInternal(err)
+	}
+	setTokenCookie(c, auth.AccessTokenCookieName, accessToken, cookieExp)
 	userMessage := convertUserFromStore(user)
 	return c.JSON(http.StatusOK, userMessage)
 }
@@ -169,13 +186,30 @@ func (s *APIV1Service) SignInSSO(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Incorrect login credentials, please try again")
 	}
 	if user == nil {
+		allowSignUpSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+			Name: SystemSettingAllowSignUpName.String(),
+		})
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find system setting").SetInternal(err)
+		}
+
+		allowSignUpSettingValue := true
+		if allowSignUpSetting != nil {
+			err = json.Unmarshal([]byte(allowSignUpSetting.Value), &allowSignUpSettingValue)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to unmarshal system setting allow signup").SetInternal(err)
+			}
+		}
+		if !allowSignUpSettingValue {
+			return echo.NewHTTPError(http.StatusUnauthorized, "signup is disabled").SetInternal(err)
+		}
+
 		userCreate := &store.User{
 			Username: userInfo.Identifier,
 			// The new signup user should be normal user by default.
 			Role:     store.RoleUser,
 			Nickname: userInfo.DisplayName,
 			Email:    userInfo.Email,
-			OpenID:   util.GenUUID(),
 		}
 		password, err := util.RandomString(20)
 		if err != nil {
@@ -195,12 +229,15 @@ func (s *APIV1Service) SignInSSO(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("User has been archived with username %s", userInfo.Identifier))
 	}
 
-	if err := GenerateTokensAndSetCookies(c, user, s.Secret); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate tokens").SetInternal(err)
+	accessToken, err := auth.GenerateAccessToken(user.Username, user.ID, time.Now().Add(auth.AccessTokenDuration), []byte(s.Secret))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to generate tokens, err: %s", err)).SetInternal(err)
 	}
-	if err := s.createAuthSignInActivity(c, user); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create activity").SetInternal(err)
+	if err := s.UpsertAccessTokenToStore(ctx, user, accessToken); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to upsert access token, err: %s", err)).SetInternal(err)
 	}
+	cookieExp := time.Now().Add(auth.CookieExpDuration)
+	setTokenCookie(c, auth.AccessTokenCookieName, accessToken, cookieExp)
 	userMessage := convertUserFromStore(user)
 	return c.JSON(http.StatusOK, userMessage)
 }
@@ -212,8 +249,15 @@ func (s *APIV1Service) SignInSSO(c echo.Context) error {
 //	@Produce	json
 //	@Success	200	{boolean}	true	"Sign-out success"
 //	@Router		/api/v1/auth/signout [POST]
-func (*APIV1Service) SignOut(c echo.Context) error {
-	RemoveTokensAndCookies(c)
+func (s *APIV1Service) SignOut(c echo.Context) error {
+	accessToken := findAccessToken(c)
+	userID, _ := getUserIDFromAccessToken(accessToken, s.Secret)
+
+	err := removeAccessTokenAndCookies(c, s.Store, userID, accessToken)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to remove access token, err: %s", err)).SetInternal(err)
+	}
+
 	return c.JSON(http.StatusOK, true)
 }
 
@@ -245,13 +289,15 @@ func (s *APIV1Service) SignUp(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Failed to find users").SetInternal(err)
 	}
+	if !util.ResourceNameMatcher.MatchString(strings.ToLower(signup.Username)) {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid username %s", signup.Username)).SetInternal(err)
+	}
 
 	userCreate := &store.User{
 		Username: signup.Username,
 		// The new signup user should be normal user by default.
 		Role:     store.RoleUser,
 		Nickname: signup.Username,
-		OpenID:   util.GenUUID(),
 	}
 	if len(existedHostUsers) == 0 {
 		// Change the default role to host if there is no host user.
@@ -264,7 +310,7 @@ func (s *APIV1Service) SignUp(c echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find system setting").SetInternal(err)
 		}
 
-		allowSignUpSettingValue := false
+		allowSignUpSettingValue := true
 		if allowSignUpSetting != nil {
 			err = json.Unmarshal([]byte(allowSignUpSetting.Value), &allowSignUpSettingValue)
 			if err != nil {
@@ -273,6 +319,23 @@ func (s *APIV1Service) SignUp(c echo.Context) error {
 		}
 		if !allowSignUpSettingValue {
 			return echo.NewHTTPError(http.StatusUnauthorized, "signup is disabled").SetInternal(err)
+		}
+
+		disablePasswordLoginSystemSetting, err := s.Store.GetSystemSetting(ctx, &store.FindSystemSetting{
+			Name: SystemSettingDisablePasswordLoginName.String(),
+		})
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find system setting").SetInternal(err)
+		}
+		if disablePasswordLoginSystemSetting != nil {
+			disablePasswordLogin := false
+			err = json.Unmarshal([]byte(disablePasswordLoginSystemSetting.Value), &disablePasswordLogin)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to unmarshal system setting").SetInternal(err)
+			}
+			if disablePasswordLogin {
+				return echo.NewHTTPError(http.StatusUnauthorized, "password login is deactivated")
+			}
 		}
 	}
 
@@ -286,57 +349,64 @@ func (s *APIV1Service) SignUp(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create user").SetInternal(err)
 	}
-	if err := GenerateTokensAndSetCookies(c, user, s.Secret); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate tokens").SetInternal(err)
+	accessToken, err := auth.GenerateAccessToken(user.Username, user.ID, time.Now().Add(auth.AccessTokenDuration), []byte(s.Secret))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to generate tokens, err: %s", err)).SetInternal(err)
 	}
-	if err := s.createAuthSignUpActivity(c, user); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create activity").SetInternal(err)
+	if err := s.UpsertAccessTokenToStore(ctx, user, accessToken); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to upsert access token, err: %s", err)).SetInternal(err)
 	}
-
+	cookieExp := time.Now().Add(auth.CookieExpDuration)
+	setTokenCookie(c, auth.AccessTokenCookieName, accessToken, cookieExp)
 	userMessage := convertUserFromStore(user)
 	return c.JSON(http.StatusOK, userMessage)
 }
 
-func (s *APIV1Service) createAuthSignInActivity(c echo.Context, user *store.User) error {
-	ctx := c.Request().Context()
-	payload := ActivityUserAuthSignInPayload{
-		UserID: user.ID,
-		IP:     echo.ExtractIPFromRealIPHeader()(c.Request()),
-	}
-	payloadBytes, err := json.Marshal(payload)
+func (s *APIV1Service) UpsertAccessTokenToStore(ctx context.Context, user *store.User, accessToken string) error {
+	userAccessTokens, err := s.Store.GetUserAccessTokens(ctx, user.ID)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal activity payload")
+		return errors.Wrap(err, "failed to get user access tokens")
 	}
-	activity, err := s.Store.CreateActivity(ctx, &store.Activity{
-		CreatorID: user.ID,
-		Type:      string(ActivityUserAuthSignIn),
-		Level:     string(ActivityInfo),
-		Payload:   string(payloadBytes),
-	})
-	if err != nil || activity == nil {
-		return errors.Wrap(err, "failed to create activity")
+	userAccessToken := storepb.AccessTokensUserSetting_AccessToken{
+		AccessToken: accessToken,
+		Description: "Account sign in",
 	}
-	return err
+	userAccessTokens = append(userAccessTokens, &userAccessToken)
+	if _, err := s.Store.UpsertUserSetting(ctx, &storepb.UserSetting{
+		UserId: user.ID,
+		Key:    storepb.UserSettingKey_USER_SETTING_ACCESS_TOKENS,
+		Value: &storepb.UserSetting_AccessTokens{
+			AccessTokens: &storepb.AccessTokensUserSetting{
+				AccessTokens: userAccessTokens,
+			},
+		},
+	}); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("failed to upsert user setting, err: %s", err)).SetInternal(err)
+	}
+	return nil
 }
 
-func (s *APIV1Service) createAuthSignUpActivity(c echo.Context, user *store.User) error {
-	ctx := c.Request().Context()
-	payload := ActivityUserAuthSignUpPayload{
-		Username: user.Username,
-		IP:       echo.ExtractIPFromRealIPHeader()(c.Request()),
-	}
-	payloadBytes, err := json.Marshal(payload)
+// removeAccessTokenAndCookies removes the jwt token from the cookies.
+func removeAccessTokenAndCookies(c echo.Context, s *store.Store, userID int32, token string) error {
+	err := s.RemoveUserAccessToken(c.Request().Context(), userID, token)
 	if err != nil {
-		return errors.Wrap(err, "failed to marshal activity payload")
+		return err
 	}
-	activity, err := s.Store.CreateActivity(ctx, &store.Activity{
-		CreatorID: user.ID,
-		Type:      string(ActivityUserAuthSignUp),
-		Level:     string(ActivityInfo),
-		Payload:   string(payloadBytes),
-	})
-	if err != nil || activity == nil {
-		return errors.Wrap(err, "failed to create activity")
-	}
-	return err
+
+	cookieExp := time.Now().Add(-1 * time.Hour)
+	setTokenCookie(c, auth.AccessTokenCookieName, "", cookieExp)
+	return nil
+}
+
+// setTokenCookie sets the token to the cookie.
+func setTokenCookie(c echo.Context, name, token string, expiration time.Time) {
+	cookie := new(http.Cookie)
+	cookie.Name = name
+	cookie.Value = token
+	cookie.Expires = expiration
+	cookie.Path = "/"
+	// Http-only helps mitigate the risk of client side script accessing the protected cookie.
+	cookie.HttpOnly = true
+	cookie.SameSite = http.SameSiteStrictMode
+	c.SetCookie(cookie)
 }

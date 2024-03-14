@@ -2,8 +2,10 @@ package s3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -48,6 +50,7 @@ func NewClient(ctx context.Context, config *Config) (*Client, error) {
 	awsConfig, err := s3config.LoadDefaultConfig(ctx,
 		s3config.WithEndpointResolverWithOptions(resolver),
 		s3config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(config.AccessKey, config.SecretKey, "")),
+		s3config.WithRegion(config.Region),
 	)
 	if err != nil {
 		return nil, err
@@ -63,13 +66,17 @@ func NewClient(ctx context.Context, config *Config) (*Client, error) {
 
 func (client *Client) UploadFile(ctx context.Context, filename string, fileType string, src io.Reader) (string, error) {
 	uploader := manager.NewUploader(client.Client)
-	uploadOutput, err := uploader.Upload(ctx, &awss3.PutObjectInput{
+	putInput := awss3.PutObjectInput{
 		Bucket:      aws.String(client.Config.Bucket),
 		Key:         aws.String(filename),
 		Body:        src,
 		ContentType: aws.String(fileType),
-		ACL:         types.ObjectCannedACL(*aws.String("public-read")),
-	})
+	}
+	// Set ACL according to if url prefix is set.
+	if client.Config.URLPrefix == "" {
+		putInput.ACL = types.ObjectCannedACL(*aws.String("public-read"))
+	}
+	uploadOutput, err := uploader.Upload(ctx, &putInput)
 	if err != nil {
 		return "", err
 	}
@@ -77,10 +84,14 @@ func (client *Client) UploadFile(ctx context.Context, filename string, fileType 
 	link := uploadOutput.Location
 	// If url prefix is set, use it as the file link.
 	if client.Config.URLPrefix != "" {
-		link = fmt.Sprintf("%s/%s%s", client.Config.URLPrefix, filename, client.Config.URLSuffix)
+		parts := strings.Split(filename, "/")
+		for i := range parts {
+			parts[i] = url.PathEscape(parts[i])
+		}
+		link = fmt.Sprintf("%s/%s%s", client.Config.URLPrefix, strings.Join(parts, "/"), client.Config.URLSuffix)
 	}
 	if link == "" {
-		return "", fmt.Errorf("failed to get file link")
+		return "", errors.New("failed to get file link")
 	}
 	return link, nil
 }

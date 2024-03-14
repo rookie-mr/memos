@@ -1,4 +1,4 @@
-import { Button, Input, Typography } from "@mui/joy";
+import { Button, IconButton, Input, Typography } from "@mui/joy";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import * as api from "@/helpers/api";
@@ -109,9 +109,9 @@ const CreateStorageServiceDialog: React.FC<Props> = (props: Props) => {
         <span className="title-text ml-auto">
           {t(isCreating ? "setting.storage-section.create-storage" : "setting.storage-section.update-storage")}
         </span>
-        <button className="btn close-btn ml-auto" onClick={handleCloseBtnClick}>
-          <Icon.X />
-        </button>
+        <IconButton size="sm" onClick={handleCloseBtnClick}>
+          <Icon.X className="w-5 h-auto" />
+        </IconButton>
       </div>
       <div className="dialog-content-container min-w-[19rem]">
         <Typography className="!mb-1" level="body-md">
@@ -187,7 +187,11 @@ const CreateStorageServiceDialog: React.FC<Props> = (props: Props) => {
         />
         <div className="flex flex-row items-center mb-1">
           <Typography level="body-md">{t("setting.storage-section.path")}</Typography>
-          <LearnMore className="ml-1" title={t("setting.storage-section.path-description")} url="https://usememos.com/docs/local-storage" />
+          <LearnMore
+            className="ml-1"
+            title={t("setting.storage-section.path-description")}
+            url="https://usememos.com/docs/advanced-settings/local-storage"
+          />
         </div>
         <Input
           className="mb-2"

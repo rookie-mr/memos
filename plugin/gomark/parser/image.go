@@ -1,55 +1,56 @@
 package parser
 
-import "github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+import (
+	"github.com/usememos/memos/plugin/gomark/ast"
+	"github.com/usememos/memos/plugin/gomark/parser/tokenizer"
+)
 
-type ImageParser struct {
-	AltText string
-	URL     string
-}
+type ImageParser struct{}
 
 func NewImageParser() *ImageParser {
 	return &ImageParser{}
 }
 
-func (*ImageParser) Match(tokens []*tokenizer.Token) *ImageParser {
-	if len(tokens) < 5 {
-		return nil
+func (*ImageParser) Match(tokens []*tokenizer.Token) (ast.Node, int) {
+	matchedTokens := tokenizer.GetFirstLine(tokens)
+	if len(matchedTokens) < 5 {
+		return nil, 0
 	}
-	if tokens[0].Type != tokenizer.ExclamationMark {
-		return nil
+	if matchedTokens[0].Type != tokenizer.ExclamationMark {
+		return nil, 0
 	}
-	if tokens[1].Type != tokenizer.LeftSquareBracket {
-		return nil
+	if matchedTokens[1].Type != tokenizer.LeftSquareBracket {
+		return nil, 0
 	}
-	cursor, altText := 2, ""
-	for ; cursor < len(tokens)-2; cursor++ {
-		if tokens[cursor].Type == tokenizer.Newline {
-			return nil
-		}
-		if tokens[cursor].Type == tokenizer.RightSquareBracket {
+	cursor, altTokens := 2, []*tokenizer.Token{}
+	for ; cursor < len(matchedTokens)-2; cursor++ {
+		if matchedTokens[cursor].Type == tokenizer.RightSquareBracket {
 			break
 		}
-		altText += tokens[cursor].Value
+		altTokens = append(altTokens, matchedTokens[cursor])
 	}
-	if tokens[cursor+1].Type != tokenizer.LeftParenthesis {
-		return nil
+	if matchedTokens[cursor+1].Type != tokenizer.LeftParenthesis {
+		return nil, 0
 	}
-	matched, url := false, ""
-	for _, token := range tokens[cursor+2:] {
-		if token.Type == tokenizer.Newline || token.Type == tokenizer.Space {
-			return nil
+
+	cursor += 2
+	contentTokens, matched := []*tokenizer.Token{}, false
+	for _, token := range matchedTokens[cursor:] {
+		if token.Type == tokenizer.Space {
+			return nil, 0
 		}
 		if token.Type == tokenizer.RightParenthesis {
 			matched = true
 			break
 		}
-		url += token.Value
+		contentTokens = append(contentTokens, token)
 	}
-	if !matched || url == "" {
-		return nil
+	if !matched || len(contentTokens) == 0 {
+		return nil, 0
 	}
-	return &ImageParser{
-		AltText: altText,
-		URL:     url,
-	}
+
+	return &ast.Image{
+		AltText: tokenizer.Stringify(altTokens),
+		URL:     tokenizer.Stringify(contentTokens),
+	}, 0
 }

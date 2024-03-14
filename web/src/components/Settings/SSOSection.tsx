@@ -1,6 +1,7 @@
-import { Divider } from "@mui/joy";
+import { Button, Divider, List, ListItem } from "@mui/joy";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 import * as api from "@/helpers/api";
 import { useGlobalStore } from "@/store/module";
 import { useTranslate } from "@/utils/i18n";
@@ -41,7 +42,7 @@ const SSOSection = () => {
     showCommonDialog({
       title: t("setting.sso-section.delete-sso"),
       content: content,
-      style: "warning",
+      style: "danger",
       dialogName: "delete-identity-provider-dialog",
       onConfirm: async () => {
         try {
@@ -56,20 +57,15 @@ const SSOSection = () => {
   };
 
   return (
-    <div className="section-container">
-      <div className="mb-2 w-full flex flex-row justify-start items-center gap-1">
-        <span className="font-mono text-sm text-gray-400">{t("setting.sso-section.sso-list")}</span>
-        <LearnMore url="https://usememos.com/docs/keycloak" />
-        <button
-          className="btn-normal px-2 py-0 ml-1"
-          onClick={() => showCreateIdentityProviderDialog(undefined, fetchIdentityProviderList)}
-        >
-          {t("common.create")}
-        </button>
+    <div className="w-full flex flex-col gap-2 pt-2 pb-4">
+      <div className="w-full flex flex-row justify-between items-center gap-1">
+        <div className="flex flex-row items-center gap-1">
+          <span className="font-mono text-gray-400">{t("setting.sso-section.sso-list")}</span>
+          <LearnMore url="https://usememos.com/docs/advanced-settings/keycloak" />
+        </div>
+        <Button onClick={() => showCreateIdentityProviderDialog(undefined, fetchIdentityProviderList)}>{t("common.create")}</Button>
       </div>
-
       <Divider />
-
       {identityProviderList.map((identityProvider) => (
         <div
           key={identityProvider.id}
@@ -104,6 +100,26 @@ const SSOSection = () => {
           </div>
         </div>
       ))}
+      {identityProviderList.length === 0 && (
+        <div className="w-full mt-2 text-sm dark:border-zinc-700 opacity-60 flex flex-row items-center justify-between">
+          <p className="">No SSO found.</p>
+        </div>
+      )}
+
+      <div className="w-full mt-4">
+        <p className="text-sm">{t("common.learn-more")}:</p>
+        <List component="ul" marker="disc" size="sm">
+          <ListItem>
+            <Link
+              className="text-sm text-blue-600 hover:underline"
+              to="https://www.usememos.com/docs/advanced-settings/keycloak"
+              target="_blank"
+            >
+              Configuring Keycloak for Authentication
+            </Link>
+          </ListItem>
+        </List>
+      </div>
     </div>
   );
 };

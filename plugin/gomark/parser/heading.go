@@ -1,53 +1,44 @@
 package parser
 
 import (
+	"github.com/usememos/memos/plugin/gomark/ast"
 	"github.com/usememos/memos/plugin/gomark/parser/tokenizer"
 )
 
-type HeadingParser struct {
-	Level         int
-	ContentTokens []*tokenizer.Token
-}
+type HeadingParser struct{}
 
 func NewHeadingParser() *HeadingParser {
 	return &HeadingParser{}
 }
 
-func (*HeadingParser) Match(tokens []*tokenizer.Token) *HeadingParser {
-	cursor := 0
-	for _, token := range tokens {
-		if token.Type == tokenizer.Hash {
-			cursor++
-		} else {
-			break
+func (*HeadingParser) Match(tokens []*tokenizer.Token) (ast.Node, int) {
+	matchedTokens := tokenizer.GetFirstLine(tokens)
+	spaceIndex := tokenizer.FindUnescaped(matchedTokens, tokenizer.Space)
+	if spaceIndex < 0 {
+		return nil, 0
+	}
+
+	for _, token := range matchedTokens[:spaceIndex] {
+		if token.Type != tokenizer.PoundSign {
+			return nil, 0
 		}
 	}
-	if len(tokens) <= cursor+1 {
-		return nil
-	}
-	if tokens[cursor].Type != tokenizer.Space {
-		return nil
-	}
-	level := cursor
+	level := spaceIndex
 	if level == 0 || level > 6 {
-		return nil
+		return nil, 0
 	}
 
-	cursor++
-	contentTokens := []*tokenizer.Token{}
-	for _, token := range tokens[cursor:] {
-		if token.Type == tokenizer.Newline {
-			break
-		}
-		contentTokens = append(contentTokens, token)
-		cursor++
-	}
+	contentTokens := matchedTokens[level+1:]
 	if len(contentTokens) == 0 {
-		return nil
+		return nil, 0
+	}
+	children, err := ParseInline(contentTokens)
+	if err != nil {
+		return nil, 0
 	}
 
-	return &HeadingParser{
-		Level:         level,
-		ContentTokens: contentTokens,
-	}
+	return &ast.Heading{
+		Level:    level,
+		Children: children,
+	}, len(contentTokens) + level + 1
 }
