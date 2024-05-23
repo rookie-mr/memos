@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { convertFileToBase64 } from "@/helpers/utils";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { UserNamePrefix, useUserStore } from "@/store/v1";
-import { User as UserPb } from "@/types/proto/api/v2/user_service";
+import { User as UserPb } from "@/types/proto/api/v1/user_service";
 import { useTranslate } from "@/utils/i18n";
 import { generateDialog } from "./Dialog";
 import Icon from "./Icon";
@@ -27,7 +27,7 @@ const UpdateAccountDialog: React.FC<Props> = ({ destroy }: Props) => {
   const userStore = useUserStore();
   const [state, setState] = useState<State>({
     avatarUrl: currentUser.avatarUrl,
-    username: currentUser.name.replace(UserNamePrefix, ""),
+    username: currentUser.username,
     nickname: currentUser.nickname,
     email: currentUser.email,
     description: currentUser.description,

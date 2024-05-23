@@ -1,45 +1,64 @@
 {
-  "amount-text": {
-    "memo_few": "",
-    "memo_many": "",
-    "memo_one": "НОТАТКА"
-  },
   "auth": {
-    "host-tip": "Ви реєструєте власника сайту."
+    "create-your-account": "Створіть свій обліковий запис",
+    "host-tip": "Ви реєструєте власника сайту.",
+    "new-password": "Новий пароль",
+    "repeat-new-password": "Повторіть новий пароль",
+    "sign-in-tip": "Вже маєте обліковий запис?",
+    "sign-up-tip": "Ще не маєте облікового запису?"
   },
   "common": {
     "about": "Про Memos",
     "admin": "Адміністратор",
     "archive": "Архівувати",
+    "archived": "Архів",
     "avatar": "Avatar",
     "basic": "Базові",
+    "beta": "Бета-версія",
     "cancel": "Скасувати",
     "change": "Змінити",
     "close": "Закрити",
     "confirm": "Підтвердити",
     "create": "Створити",
-    "database": "Database",
+    "database": "База даних",
+    "days": "Днів",
     "delete": "Видалити",
+    "description": "Опис",
     "edit": "Редагувати",
-    "email": "Емейл",
+    "email": "Електронна пошта",
     "explore": "Більше",
+    "file": "Файл",
     "filter": "Фільтр",
+    "home": "Домівка",
     "image": "Світлина",
+    "inbox": "Вхідні",
     "language": "Мова",
+    "learn-more": "Дізнатися більше",
     "link": "Посилання",
     "mark": "Mark",
     "nickname": "Нікнейм",
     "null": "Пусто",
+    "or": "або",
     "password": "Пароль",
     "pin": "Закріпити",
+    "preview": "Попередній перегляд",
+    "profile": "Профіль",
+    "remember-me": "Запам'ятати мене",
+    "rename": "Перейменувати",
     "reset": "Стерти",
+    "resources": "Матеріали",
     "restore": "Відновити",
+    "role": "Роль",
     "save": "Зберегти",
+    "search": "Пошук",
     "select": "Вибрати",
+    "settings": "Налаштування",
     "share": "Поділитися",
     "sign-in": "Увійти",
+    "sign-in-with": "Увійти через {{provider}}",
     "sign-out": "Вийти",
     "sign-up": "Зареєструватися",
+    "statistics": "Статистика",
     "tags": "Теги",
     "title": "Заголовок",
     "type": "Типу",
@@ -58,14 +77,28 @@
     "wed": "Сер."
   },
   "editor": {
-    "cancel-edit": "Скасувати",
-    "editing": "Редагування...",
-    "local": "З комп'ютера",
-    "placeholder": "Ваші думки...",
+    "add-your-comment-here": "Додайте свій коментар тут...",
+    "any-thoughts": "Ваші думки...",
     "save": "Зберегти"
   },
+  "inbox": {
+    "memo-comment": "{{user}} має коментар на {{memo}}.",
+    "version-update": "Нова версія {{version}} доступна вже зараз!"
+  },
   "memo": {
+    "comment": {
+      "self": "Коментарі",
+      "write-a-comment": "Напишіть коментар"
+    },
     "copy-link": "Копіювати посилання",
+    "count-memos-in-date": "{{count}} нотаток за {{date}}",
+    "delete-confirm": "Ви впевнені, що бажаєте видалити цю нотатку? ЦЯ ДІЯ НЕЗВОРОТНА",
+    "delete-memo": "Видалити нотатку",
+    "fetch-more": "Натисніть, аби завантажити більше",
+    "fetching-data": "Отримання даних…",
+    "no-archived-memos": "Немає архівованих нотатків.",
+    "search-placeholder": "Пошук нотатків",
+    "show-more": "Показати більше",
     "view-detail": "Деталі",
     "visibility": {
       "disabled": "Public memos are disabled",
@@ -75,49 +108,37 @@
     }
   },
   "message": {
+    "archived-successfully": "Успішно архівовано",
     "change-memo-created-time": "Змінити час створення нотатки",
-    "change-resource-filename": "Змінити назву файла",
-    "click-to-save-the-image": "Натисніть щоб зберегти світлину",
     "copied": "Скопійовано",
-    "count-selected-resources": "Всього вибрано",
+    "deleted-successfully": "Успішно видалено",
     "fill-all": "Будь ласка заповність усі поля.",
-    "fill-form": "Будь ласка заповніть форму",
-    "generating-the-screenshot": "Створюємо знімок...",
-    "image-load-failed": "Помилка завантаження зображення",
-    "invalid-created-datetime": "Невірний час створення.",
-    "invalid-resource-filename": "Невірна назва файла.",
-    "login-failed": "Помилка входу",
-    "memo-not-found": "Нотатку не знайдено.",
-    "memo-updated-datetime": "Час створення змінено.",
-    "memos-ready": "більше нотаток немає 🎉",
+    "maximum-upload-size-is": "Максимально дозволений розмір завантаження - {{size}} MiB",
+    "memo-not-found": "Нотаток не знайдено.",
     "new-password-not-match": "Нові паролі не співпадають.",
+    "no-data": "Нотатків не знайдено.",
     "password-changed": "Пароль змінено",
     "password-not-match": "Паролі не співпадають.",
-    "private-only": "Ця нотатка приватна.",
-    "resource-filename-updated": "Назву файла змінено.",
-    "restored-successfully": "Відновлення успішне.",
-    "signup-failed": "Помилка реєстрації",
-    "succeed-copy-code": "Succeed to copy code to clipboard.",
-    "succeed-copy-content": "Скопійовано текст в буфер обміну.",
+    "restored-successfully": "Успішно відновлено",
     "succeed-copy-link": "Скопійовано посилання в буфер обміну.",
-    "succeed-copy-resource-link": "Посилання на ресурс скопійовано в буфер обміну",
-    "succeed-update-additional-script": "Успішно додано скрипти",
-    "succeed-update-additional-style": "Успішно додано стилі",
-    "succeed-update-customized-profile": "Успішно збережено власний профіль",
-    "succeed-vacuum-database": "БД стиснуто",
     "update-succeed": "Збережно",
     "user-not-found": "Користувача не знайдено"
+  },
+  "reference": {
+    "add-references": "Додати посилання",
+    "embedded-usage": "Відобразити текст нотатку",
+    "no-memos-found": "Нотатки не знайдені"
   },
   "resource": {
     "clear": "Clear",
     "copy-link": "Копіювати посилання",
     "delete-resource": "Видалити ресурс",
-    "fetching-data": "завантаження даних...",
+    "fetching-data": "Завантаження даних…",
+    "file-drag-drop-prompt": "Перетягніть файл сюди, щоб завантажити його",
     "linked-amount": "Кількість нотаток",
+    "no-files-selected": "Не вибрано жодного файла",
     "no-resources": "Немає ресурсів.",
-    "no-unused-resources": "Немає невикористаних ресурсів",
-    "warning-text": "Ви впевнені що хочете видалити цей ресурс? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗",
-    "warning-text-unused": "Ви впенвені що хочете видалити невикористовувані ресурси? ЦЮ ДІЮ НЕМОЖЛИВО СКАСУВАТИ❗"
+    "no-unused-resources": "Немає невикористаних ресурсів"
   },
   "setting": {
     "account-section": {
@@ -162,13 +183,9 @@
         "icon-url": "URL іконки",
         "title": "Налаштувати додаток"
       },
-      "database-file-size": "Розмір файлу бази даних",
       "disable-public-memos": "Disable public memos",
       "display-with-updated-time": "Display with updated time",
       "server-name": "Назва додатка"
     }
-  },
-  "tag": {
-    "tip-text": "Введіть `#tag` щоб створити"
   }
 }

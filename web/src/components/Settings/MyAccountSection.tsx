@@ -1,9 +1,10 @@
-import { Button } from "@mui/joy";
+import { Button, Dropdown, Menu, MenuButton, MenuItem } from "@mui/joy";
 import { memoServiceClient } from "@/grpcweb";
 import { downloadFileFromUrl } from "@/helpers/utils";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useTranslate } from "@/utils/i18n";
 import showChangePasswordDialog from "../ChangePasswordDialog";
+import Icon from "../Icon";
 import showUpdateAccountDialog from "../UpdateAccountDialog";
 import UserAvatar from "../UserAvatar";
 import AccessTokenSection from "./AccessTokenSection";
@@ -26,22 +27,28 @@ const MyAccountSection = () => {
         <UserAvatar className="mr-2 shrink-0 w-10 h-10" avatarUrl={user.avatarUrl} />
         <div className="max-w-[calc(100%-3rem)] flex flex-col justify-center items-start">
           <p className="w-full">
-            <span className="text-xl leading-none font-medium">{user.nickname}</span>
-            <span className="ml-1 text-base leading-none text-gray-500 dark:text-gray-400">({user.username})</span>
+            <span className="text-xl leading-tight font-medium">{user.nickname}</span>
+            <span className="ml-1 text-base leading-tight text-gray-500 dark:text-gray-400">({user.username})</span>
           </p>
-          <p className="w-4/5 leading-none text-sm truncate">{user.description}</p>
+          <p className="w-4/5 leading-tight text-sm truncate">{user.description}</p>
         </div>
       </div>
       <div className="w-full flex flex-row justify-start items-center mt-2 space-x-2">
-        <Button variant="outlined" onClick={showUpdateAccountDialog}>
+        <Button variant="outlined" color="neutral" size="sm" onClick={showUpdateAccountDialog}>
+          <Icon.PenLine className="w-4 h-4 mx-auto mr-1" />
           {t("common.edit")}
         </Button>
-        <Button variant="outlined" onClick={showChangePasswordDialog}>
-          {t("setting.account-section.change-password")}
-        </Button>
-        <Button variant="outlined" onClick={() => downloadExportedMemos(user)}>
-          {t("setting.account-section.export-memos")}
-        </Button>
+        <Dropdown>
+          <MenuButton slots={{ root: "div" }}>
+            <Button variant="outlined" color="neutral" size="sm">
+              <Icon.MoreVertical className="w-4 h-4 mx-auto" />
+            </Button>
+          </MenuButton>
+          <Menu className="text-sm" size="sm" placement="bottom">
+            <MenuItem onClick={showChangePasswordDialog}>{t("setting.account-section.change-password")}</MenuItem>
+            <MenuItem onClick={() => downloadExportedMemos(user)}>{t("setting.account-section.export-memos")}</MenuItem>
+          </Menu>
+        </Dropdown>
       </div>
 
       <AccessTokenSection />

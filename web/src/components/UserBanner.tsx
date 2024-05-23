@@ -1,8 +1,9 @@
 import { Dropdown, Menu, MenuButton, MenuItem } from "@mui/joy";
-import classNames from "classnames";
+import clsx from "clsx";
 import { authServiceClient } from "@/grpcweb";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { useGlobalStore } from "@/store/module";
+import useNavigateTo from "@/hooks/useNavigateTo";
+import { Routes } from "@/router";
 import { useTranslate } from "@/utils/i18n";
 import Icon from "./Icon";
 import UserAvatar from "./UserAvatar";
@@ -14,10 +15,9 @@ interface Props {
 const UserBanner = (props: Props) => {
   const { collapsed } = props;
   const t = useTranslate();
-  const globalStore = useGlobalStore();
-  const { systemStatus } = globalStore.state;
+  const navigateTo = useNavigateTo();
   const user = useCurrentUser();
-  const title = user ? user.nickname || user.username : systemStatus.customizedProfile.name || "memos";
+  const title = user ? user.nickname || user.username : "memos";
   const avatarUrl = user ? user.avatarUrl : "/full-logo.webp";
 
   const handleSignOut = async () => {
@@ -26,11 +26,11 @@ const UserBanner = (props: Props) => {
   };
 
   return (
-    <div className="relative w-auto h-auto px-1 shrink-0">
+    <div className="relative w-full h-auto px-1 shrink-0">
       <Dropdown>
         <MenuButton disabled={!user} slots={{ root: "div" }}>
           <div
-            className={classNames(
+            className={clsx(
               "py-1 my-1 w-auto flex flex-row justify-start items-center cursor-pointer rounded-2xl border border-transparent text-gray-800 dark:text-gray-400",
               collapsed ? "px-1" : "px-3",
             )}
@@ -41,8 +41,12 @@ const UserBanner = (props: Props) => {
         </MenuButton>
         <Menu placement="bottom-start" style={{ zIndex: "9999" }}>
           <MenuItem onClick={handleSignOut}>
-            <Icon.LogOut className="w-4 h-auto opacity-60 shrink-0" />
+            <Icon.LogOut className="w-4 h-auto opacity-60" />
             <span className="truncate">{t("common.sign-out")}</span>
+          </MenuItem>
+          <MenuItem onClick={() => navigateTo(Routes.ABOUT)}>
+            <Icon.Smile className="w-4 h-auto opacity-60" />
+            <span className="truncate">{t("common.about")}</span>
           </MenuItem>
         </Menu>
       </Dropdown>

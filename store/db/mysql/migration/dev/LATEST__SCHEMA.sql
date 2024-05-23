@@ -37,13 +37,15 @@ CREATE TABLE `user_setting` (
 -- memo
 CREATE TABLE `memo` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `resource_name` VARCHAR(256) NOT NULL UNIQUE,
+  `uid` VARCHAR(256) NOT NULL UNIQUE,
   `creator_id` INT NOT NULL,
   `created_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `row_status` VARCHAR(256) NOT NULL DEFAULT 'NORMAL',
   `content` TEXT NOT NULL,
-  `visibility` VARCHAR(256) NOT NULL DEFAULT 'PRIVATE'
+  `visibility` VARCHAR(256) NOT NULL DEFAULT 'PRIVATE',
+  `tags` JSON NOT NULL,
+  `payload` JSON NOT NULL
 );
 
 -- memo_organizer
@@ -65,24 +67,18 @@ CREATE TABLE `memo_relation` (
 -- resource
 CREATE TABLE `resource` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `resource_name` VARCHAR(256) NOT NULL UNIQUE,
+  `uid` VARCHAR(256) NOT NULL UNIQUE,
   `creator_id` INT NOT NULL,
   `created_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_ts` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `filename` TEXT NOT NULL,
   `blob` MEDIUMBLOB,
-  `external_link` TEXT NOT NULL,
   `type` VARCHAR(256) NOT NULL DEFAULT '',
   `size` INT NOT NULL DEFAULT '0',
-  `internal_path` VARCHAR(256) NOT NULL DEFAULT '',
-  `memo_id` INT DEFAULT NULL
-);
-
--- tag
-CREATE TABLE `tag` (
-  `name` VARCHAR(256) NOT NULL,
-  `creator_id` INT NOT NULL,
-  UNIQUE(`name`,`creator_id`)
+  `memo_id` INT DEFAULT NULL,
+  `storage_type` VARCHAR(256) NOT NULL DEFAULT '',
+  `reference` VARCHAR(256) NOT NULL DEFAULT '',
+  `payload` TEXT NOT NULL
 );
 
 -- activity
@@ -93,14 +89,6 @@ CREATE TABLE `activity` (
   `type` VARCHAR(256) NOT NULL DEFAULT '',
   `level` VARCHAR(256) NOT NULL DEFAULT 'INFO',
   `payload` TEXT NOT NULL
-);
-
--- storage
-CREATE TABLE `storage` (
-  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name` VARCHAR(256) NOT NULL,
-  `type` VARCHAR(256) NOT NULL,
-  `config` TEXT NOT NULL
 );
 
 -- idp

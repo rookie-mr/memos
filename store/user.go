@@ -82,6 +82,12 @@ type FindUser struct {
 	Role      *Role
 	Email     *string
 	Nickname  *string
+
+	// Random and limit are used in list users.
+	// Whether to return random users.
+	Random bool
+	// The maximum number of users to return.
+	Limit *int
 }
 
 type DeleteUser struct {
@@ -125,9 +131,11 @@ func (s *Store) GetUser(ctx context.Context, find *FindUser) (*User, error) {
 		if *find.ID == SystemBotID {
 			return SystemBot, nil
 		}
-
 		if cache, ok := s.userCache.Load(*find.ID); ok {
-			return cache.(*User), nil
+			user, ok := cache.(*User)
+			if ok {
+				return user, nil
+			}
 		}
 	}
 
